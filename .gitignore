@@ -1,0 +1,6 @@
+/bin
+/obj
+/.editorconfig
+/.vs
+/lapis.csproj
+/lapis.sln

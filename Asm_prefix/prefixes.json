@@ -1,0 +1,3 @@
+{
+  "prefixes":  ["syscall.asm", "exit.asm"]
+}

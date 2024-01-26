@@ -1,0 +1,2 @@
+_syscall:
+	syscall
