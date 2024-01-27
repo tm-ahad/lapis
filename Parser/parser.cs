@@ -5,52 +5,11 @@ using lapis.Helpers;
 
 namespace lapis.parser
 {
-    public class Parser
+    public class Parser : HelperParsers
     {
-        private VarMap varMap;
         private int token_len = 3;
 
-        public Parser() 
-        {
-            varMap = new VarMap();
-        }
-
-        private List<Instruction> ParseVarDecr(string line) 
-        {
-            string[] split = line.Split(' ');
-            string type = split[1];
-            string value_type_and_name = split[2];
-
-            string[] spl = value_type_and_name.Split("@");
-            string value_type = spl[0];
-            string name = spl[1];
-
-            string raw_val = split[3];
-            string val;
-
-            switch (value_type)
-            {
-                case Consts.Token_var:
-                    val = varMap.GetVar(raw_val);
-                    break;
-                case Consts.Token_value:
-                    val = Types.Type.Value(raw_val, Types.Type.FromString(type));
-                    break;
-                default:
-                    throw new Exception("Error: invalid value type '{value_type}'");
-            }
-
-            byte size = Types.Type.Size(Types.Type.FromString(type));
-            string ptr = Gen.Generate(size);
-
-            var insts = new List<Instruction>
-            {
-                new Instruction.Mov(ptr, val)
-            };
-
-            varMap.SetVar(name, ptr);
-            return insts;
-        }
+        public Parser() : base(new VarMap()) { }
 
         private List<Instruction> ParseSetDecr(string line)
         {
@@ -58,13 +17,46 @@ namespace lapis.parser
             string a = split[1];
             string b = split[2];
 
-            string a_ptr = varMap.GetVar(a);
-            string b_ptr = varMap.GetVar(b);
+            Var varA = varMap.GetVar(a);
+            byte type = varA.Type;
+            string ptr = varA.Ptr;
+
+            var (extra, name) = ParseRawValue(type, a, b);
 
             List<Instruction> insts = new List<Instruction>
             {
-                new Instruction.Mov(a_ptr, b_ptr)
+                new Instruction.Mov(ptr, name)
             };
+            insts.AddRange(extra);
+
+            return insts;
+        }
+        private List<Instruction> ParseVarDecr(string line)
+        {
+            string[] split = line.Split(' ');
+            string type = split[1];
+            string name = split[2];
+
+            string raw_val = split[3];
+            
+            byte size = Types.Type.Size(Types.Type.FromString(type));
+            string ptr = Gen.Generate(size);
+
+            Var var = new Var(ptr, Types.Type.FromString(type));
+            varMap.SetVar(name, var);
+
+            var (extra, val) = ParseRawValue(
+                Types.Type.FromString(type),
+                name,
+                raw_val
+            );
+
+            var insts = new List<Instruction>
+            {
+                new Instruction.Mov(ptr, val)
+            };
+
+            insts.AddRange(extra);
 
             return insts;
         }
@@ -73,17 +65,20 @@ namespace lapis.parser
         {
             List<Instruction> insts = new List<Instruction>();
 
-            foreach (string line in code.Split(";"))
+            foreach (string lin in code.Split(";"))
             {
+                string line = lin.Trim();
+                if (line.Length == 0) continue;
+
                 string tok = line.Substring(0, token_len);
 
                 switch (tok)
                 {
-                    case Consts.Token_var: 
-                        insts.Concat(ParseVarDecr(line));
+                    case Consts.Token_var:
+                        insts.AddRange(ParseVarDecr(line));
                         break;
-                    case Consts.Token_set: 
-                        insts.Concat(ParseSetDecr(line));
+                    case Consts.Token_set:
+                        insts.AddRange(ParseSetDecr(line));
                         break;
                     case Consts.Token_comment:
                         break;

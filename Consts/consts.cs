@@ -9,7 +9,7 @@
         public const string Token_div = "div";
         public const string Token_if = "@if";
         public const string Token_expr = "expr";
-        public const string Token_value = "value";
+        public const string Token_value = "lit";
         public const string Token_comment = "###";
     }
 }

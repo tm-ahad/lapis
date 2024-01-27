@@ -1,13 +1,38 @@
-﻿namespace lapis.Helpers
+﻿using System;
+
+namespace lapis.Helpers
 {
     public class VarMap
     {
-        private Dictionary<string, string> map = new Dictionary<string, string>();
+        private Dictionary<string, Var> map = new Dictionary<string, Var>();
         public VarMap() { }
 
-        public string GetVar(string var_name)
+        public string GetVarPtr(string var_name)
         {
             if (map.ContainsKey(var_name)) 
+            {
+                return map[var_name].Ptr;
+            }
+            else
+            {
+                throw new Exception($"Error: var {var_name} not found");
+            }
+        }
+
+        public byte GetVarType(string var_name)
+        {
+            if (map.ContainsKey(var_name))
+            {
+                return map[var_name].Type;
+            }
+            else
+            {
+                throw new Exception($"Error: var {var_name} not found");
+            }
+        }
+        public Var GetVar(string var_name)
+        {
+            if (map.ContainsKey(var_name))
             {
                 return map[var_name];
             }
@@ -17,9 +42,9 @@
             }
         }
 
-        public void SetVar(string var_name, string ptr)
+        public void SetVar(string var_name, Var var)
         {
-            map[var_name] = ptr;
+            map[var_name] = var;
         }
     }
 }

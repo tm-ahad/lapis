@@ -15,7 +15,7 @@
 
             public override string ToString()
             {
-                return $"mov ${To}, ${From}";
+                return $"mov {To}, {From}";
             }
         }
 
@@ -32,7 +32,7 @@
 
             public override string ToString()
             {
-                return $"mov ${To}, ${From}";
+                return $"add {To},{From}";
             }
         }
 
@@ -49,7 +49,7 @@
 
             public override string ToString()
             {
-                return $"mov ${To}, ${From}";
+                return $"sub {To},{From}";
             }
         }
 
@@ -66,7 +66,7 @@
 
             public override string ToString()
             {
-                return $"mov ${To}, ${From}";
+                return $"imul {To},{From}";
             }
         }
 
@@ -83,7 +83,7 @@
 
             public override string ToString()
             {
-                return $"mov ${To}, ${From}";
+                return $"idiv {To},{From}";
             }
         }
 
@@ -98,7 +98,7 @@
 
             public override string ToString()
             {
-                return $"call ${function}";
+                return $"call {function}";
             }
         }
     }

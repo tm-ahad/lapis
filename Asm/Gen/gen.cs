@@ -1,20 +1,24 @@
 ﻿using lapis.Asm.Inst;
+using lapis.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace lapis.Asm.Gen
 {
-    internal class Gen
+    public class Gen
     {
-        public static string Generate(List<Instruction> insts) 
+        public static async Task<string> GenerateAsync(List<Instruction> insts)
         {
-            string main = string.Empty;
+            StringBuilder main = new StringBuilder();
+            string prefixes = await Fetcher.FetchPrefixes();
 
             foreach (Instruction inst in insts)
             {
-                main.Concat(inst.ToString());
-                main.Concat("\n");
+                main.AppendLine(inst.ToString());
             }
 
-            return $"section .text\nglobal _start\n_start:{main}\ncall exit";
+            return $"section .text\nglobal _start\n{prefixes}\n_start:\n{main}call exit";
         }
     }
 }

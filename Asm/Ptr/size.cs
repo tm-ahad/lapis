@@ -3,10 +3,10 @@
     public class PtrSize
     {
         public const byte 
-        BYTE = 0, 
-        WORD = 1,
-        DWORD = 2,
-        QWORD = 3;
+        BYTE = 1, 
+        WORD = 2,
+        DWORD = 4,
+        QWORD = 8;
 
         public static string ToString(byte size)
         {
