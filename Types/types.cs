@@ -1,31 +1,65 @@
 ﻿using lapis.Asm.Ptr;
+
 namespace lapis.Types
 {
-    public abstract class Type
+    public class Type
     {
-        public const byte Int = 0, Uint = 1, String = 2, Array = 3;
+        public const byte
+        Int = 0,
+        Uint = 1,
+        Byte = 2,
+        I8 = 3,
+        I16 = 4,
+        U16 = 5,
+        I64 = 6,
+        U64 = 7,
+        Array = 8,
+        Unknown = 255;
+
         private const string Arr_def = "[]";
 
         public static byte Size(byte type)
         {
-            if (type == Int || type is Uint)
+            if (type == Int || type == Uint)
             {
                 return PtrSize.DWORD;
+            }
+            else if (type == I8 || type == Byte) 
+            {
+                return PtrSize.BYTE;
+            }
+            else if (type == I16 || type == U16)
+            {
+                return PtrSize.WORD;
+            }
+            else if (type == I64 || type == U64)
+            {
+                return PtrSize.QWORD;
+            }
+            else if (type >= Array) 
+            {
+                return PtrSize.UNKNOWN;
             }
 
             throw new Exception($"Typerror: type {type} not found");
         }
 
-        private static string ToString(byte type)
+        public static string ToString(byte type)
         {
             switch (type)
             {
                 case Int: return "int";
                 case Uint: return "uint";
-                case String: return "string";
+                case I8: return "int8";
+                case Byte: return "byte";
+                case I16: return "int16";
+                case U16: return "uint16";
+                case I64: return "int64";
+                case U64: return "uint64";
+                case Unknown: return "unknown";
             }
 
-            if (type > Array)
+            if (type >= Array)
             {
                 byte arr_element_type = (byte)(type - Array);
                 string arr_element_type_str = ToString(arr_element_type);
@@ -36,13 +70,30 @@ namespace lapis.Types
             throw new Exception("5846162495");
         }
 
+        public static bool isNumber(byte type)
+        {
+            return type == Int ||
+                type == Uint ||
+                type == I8 ||
+                type == Byte ||
+                type == I16 ||
+                type == U16 ||
+                type == I64 ||
+                type == U64;
+        }
+
         public static byte FromString(string s)
         {
             switch (s)
             {
                 case "int": return Int;
                 case "uint": return Uint;
-                case "string": return String;
+                case "int8": return I8;
+                case "byte": return Byte;
+                case "int16": return I16;
+                case "uint16": return U16;
+                case "int64": return I64;
+                case "uint64": return U64;
             }
 
             if (s.StartsWith(Arr_def))
@@ -58,21 +109,24 @@ namespace lapis.Types
 
         public static string Value(string rawVal, byte type)
         {
-            if (type == Int)
+            switch (type)
             {
-                return int.Parse(rawVal).ToString();
-            }
-            else if (type == Uint)
-            {
-                return uint.Parse(rawVal).ToString();
-            }
-            else if (type >= Array) 
-            {
-                byte arr_element_type = (byte)(type - Array);
-                return arr_element_type.ToString();
-            }
-
-            throw new Exception($"Error: type {ToString(type)} not found");
+                case Byte: return byte.Parse(rawVal).ToString();
+                case I8: return sbyte.Parse(rawVal).ToString();
+                case I16: return Int16.Parse(rawVal).ToString();
+                case U16: return UInt16.Parse(rawVal).ToString();
+                case Int: return int.Parse(rawVal).ToString();
+                case Uint: return uint.Parse(rawVal).ToString();
+                case I64: return Int64.Parse(rawVal).ToString();
+                case U64: return UInt64.Parse(rawVal).ToString();
+                default: 
+                    if (type >= Array)
+                    {
+                        byte arr_element_type = (byte)(type - Array);
+                        return arr_element_type.ToString();
+                    }
+                    throw new Exception($"Error: type {ToString(type)} not found");
+            };
         }
     }
 }

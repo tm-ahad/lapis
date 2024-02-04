@@ -6,7 +6,8 @@
         BYTE = 1, 
         WORD = 2,
         DWORD = 4,
-        QWORD = 8;
+        QWORD = 8,
+        UNKNOWN = 0;
 
         public static string ToString(byte size)
         {
@@ -16,9 +17,10 @@
                 case WORD: return "WORD";
                 case DWORD: return "DWORD";
                 case QWORD: return "QWORD";
+                case UNKNOWN: return "BYTE";
             }
 
-            return string.Empty;
+            throw new Exception($"Error: invalid size {size}");
         }
     }
 }

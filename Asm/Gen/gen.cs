@@ -1,7 +1,5 @@
 ﻿using lapis.Asm.Inst;
 using lapis.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace lapis.Asm.Gen
@@ -18,7 +16,7 @@ namespace lapis.Asm.Gen
                 main.AppendLine(inst.ToString());
             }
 
-            return $"section .text\nglobal _start\n{prefixes}\n_start:\n{main}call exit";
+            return $"section .text\nglobal _start\n{prefixes}_start:\n{main}call exit";
         }
     }
 }

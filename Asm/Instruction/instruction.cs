@@ -1,4 +1,7 @@
-﻿namespace lapis.Asm.Inst
+﻿using lapis.Helpers;
+using System.Reflection.Emit;
+
+namespace lapis.Asm.Inst
 {
     public interface Instruction
     {
@@ -13,10 +16,7 @@
                 this.From = From;
             }
 
-            public override string ToString()
-            {
-                return $"mov {To}, {From}";
-            }
+            public override string ToString() => $"mov {To},{From}";
         }
 
         public sealed class Add : Instruction
@@ -30,10 +30,7 @@
                 this.From = From;
             }
 
-            public override string ToString()
-            {
-                return $"add {To},{From}";
-            }
+            public override string ToString() => $"add {To},{From}";
         }
 
         public sealed class Sub : Instruction
@@ -47,10 +44,7 @@
                 this.From = From;
             }
 
-            public override string ToString()
-            {
-                return $"sub {To},{From}";
-            }
+            public override string ToString() => $"sub {To},{From}";
         }
 
         public sealed class Mul : Instruction
@@ -64,10 +58,7 @@
                 this.From = From;
             }
 
-            public override string ToString()
-            {
-                return $"imul {To},{From}";
-            }
+            public override string ToString() => $"imul {To},{From}";
         }
 
         public sealed class Div : Instruction
@@ -81,10 +72,7 @@
                 this.From = From;
             }
 
-            public override string ToString()
-            {
-                return $"idiv {To},{From}";
-            }
+            public override string ToString() => $"idiv {To},{From}";
         }
 
         public sealed class Call : Instruction
@@ -96,10 +84,64 @@
                 this.function = function;
             }
 
-            public override string ToString()
+            public override string ToString() => $"call {function}";
+        }
+
+        public sealed class Func : Instruction
+        {
+            public string function;
+
+            public Func(string function)
             {
-                return $"call {function}";
+                this.function = function;
             }
+
+            public override string ToString() => $"{function}:";
+        }
+
+        public sealed class Asm : Instruction
+        {
+            public string code;
+
+            public Asm(string asm) 
+            {
+                code = asm;
+            }
+
+            public override string ToString() => code;
+        }
+
+        public sealed class CmpOp : Instruction
+        {
+            public ECmpOperations op;
+            public string label;
+
+            public CmpOp(ECmpOperations op, string label)
+            {
+                this.op = op;
+                this.label = label;
+            }
+
+            public override string ToString() => $"{CmpOperations.ToString(op)} {label}";
+        }
+
+        public sealed class Cmp : Instruction
+        {
+            public string a;
+            public string b;
+
+            public Cmp(string a, string b)
+            {
+                this.a = a;
+                this.b = b;
+            }
+
+            public override string ToString() => $"cmp {a},{b}";
+        }
+
+        public sealed class Ret : Instruction
+        {
+            public override string ToString() => "ret";
         }
     }
 }

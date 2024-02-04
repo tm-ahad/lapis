@@ -42,7 +42,7 @@ namespace lapis.Helpers
                         string fileUrl = $"https://raw.githubusercontent.com/tm-ahad/lapis/master/Asm_prefix/{fileName}";
 
                         string fileContent = await FetchAsync(fileUrl, cancellationToken);
-                        concatenatedContents.AppendLine($"{fileContent}\n");
+                        concatenatedContents.AppendLine(fileContent);
                     }
                 }
                 else
