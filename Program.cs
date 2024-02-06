@@ -23,7 +23,7 @@ namespace lapis
             {
                 string fileContents = File.ReadAllText(input_file);
                 List<Instruction> insts = parser.Parse(fileContents);
-                string asm_out = await Gen.GenerateAsync(insts);
+                string asm_out = Gen.Generate(insts);
 
                 File.WriteAllText(output_file, asm_out);
 

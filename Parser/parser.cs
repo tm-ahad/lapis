@@ -7,6 +7,7 @@ namespace lapis.parser
 {
     public class Parser : HelperParsers
     {
+        private Fetcher fetcher = new Fetcher();
         private int token_len = 3;
         private string? op1 = null;
         private string? op2 = null;
@@ -213,6 +214,18 @@ namespace lapis.parser
             return insts;
         }
 
+        public List<Instruction> ParseInclude(string line)
+        {
+            string[] split = line.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+            string name = split[1];
+
+            string code = fetcher.GetStdLib(name);
+            Parser parser = new Parser();
+
+            List<Instruction> insts = parser.Parse(code);
+            return insts;
+        }
+
         public List<Instruction> Parse(string code)
         {
             List<Instruction> insts = new List<Instruction>();
@@ -246,6 +259,9 @@ namespace lapis.parser
                         break;
                     case Consts.Token_if:
                         insts.AddRange(ParseIf(line));
+                        break;
+                    case Consts.Token_include:
+                        insts.AddRange(ParseInclude(line));
                         break;
                     case Consts.Token_comment:
                         break;

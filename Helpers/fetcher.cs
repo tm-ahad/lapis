@@ -5,27 +5,59 @@ namespace lapis.Helpers
 {
     public class Fetcher
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
+        string home_path;
 
-        public static async Task<string> FetchAsync(string url, CancellationToken cancellationToken = default)
+        public Fetcher()
         {
-            try
+            PlatformID platform = Environment.OSVersion.Platform;
+
+            switch (platform)
             {
-                HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync();
-            }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine($"Error fetching content from {url}: {ex.Message}");
-                throw;
+                case PlatformID.Win32NT:
+                    home_path = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.lapis";
+                    break;
+                case PlatformID.Unix:
+                case PlatformID.MacOSX:
+                    home_path = $"{Environment.GetEnvironmentVariable("HOME")}/.lapis";
+                    break;
+                default:
+                    throw new Exception($"Unsupported platform {platform}");
             }
         }
 
-        public static async Task<string> FetchPrefixes(CancellationToken cancellationToken = default)
+        static string ReadFile(string filePath)
         {
-            string jsonUrl = "https://raw.githubusercontent.com/tm-ahad/lapis/master/Asm_prefix/prefixes.json";
-            string jsonContent = await FetchAsync(jsonUrl, cancellationToken);
+            StringBuilder res = new StringBuilder();
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    using (StreamReader reader = new StreamReader(filePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            res.AppendLine(line);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("The specified file does not exist.");
+            }
+
+            return res.ToString();
+        }
+
+        public string FetchPrefixes()
+        {
+            string jsonUrl = $"{home_path}/Asm_prefix/prefixes.json";
+            string jsonContent = ReadFile(jsonUrl);
 
             StringBuilder concatenatedContents = new StringBuilder();
 
@@ -39,9 +71,9 @@ namespace lapis.Helpers
                     foreach (JsonElement prefixToken in prefixesArray.EnumerateArray())
                     {
                         string fileName = prefixToken.GetString();
-                        string fileUrl = $"https://raw.githubusercontent.com/tm-ahad/lapis/master/Asm_prefix/{fileName}";
+                        string fileUrl = $"{home_path}/Asm_prefix/{fileName}";
 
-                        string fileContent = await FetchAsync(fileUrl, cancellationToken);
+                        string fileContent = ReadFile(fileUrl);
                         concatenatedContents.AppendLine(fileContent);
                     }
                 }
@@ -57,6 +89,11 @@ namespace lapis.Helpers
             }
 
             return concatenatedContents.ToString();
+        }
+        public string GetStdLib(string name)
+        {
+            string path = $"{home_path}/lib/{name}.lps";
+            return ReadFile(path);
         }
     }
 }

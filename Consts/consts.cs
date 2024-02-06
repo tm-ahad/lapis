@@ -15,6 +15,7 @@
         public const string Token_expr = "expr";
         public const string Token_value = "lit";
         public const string Token_comment = "###";
+        public const string Token_include = "inc";
 
 
         //Config

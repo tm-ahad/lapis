@@ -6,10 +6,11 @@ namespace lapis.Asm.Gen
 {
     public class Gen
     {
-        public static async Task<string> GenerateAsync(List<Instruction> insts)
+        public static string Generate(List<Instruction> insts)
         {
+            Fetcher fetcher = new Fetcher();
             StringBuilder main = new StringBuilder();
-            string prefixes = await Fetcher.FetchPrefixes();
+            string prefixes = fetcher.FetchPrefixes();
 
             foreach (Instruction inst in insts)
             {
