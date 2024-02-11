@@ -7,8 +7,11 @@ namespace lapis.parser
 {
     public class Parser : HelperParsers
     {
-        private Fetcher fetcher = new Fetcher();
-        private int token_len = 3;
+        private new readonly FuncMap funcMap = new();
+        private readonly Fetcher fetcher = new();
+        private string? loop_name = string.Empty;
+        private ECmpOperations loop_comp = 0;
+        private readonly int token_len = 3;
         private string? op1 = null;
         private string? op2 = null;
 
@@ -69,7 +72,19 @@ namespace lapis.parser
             return insts;
         }
 
-        private Instruction ParseRet(string _) => new Instruction.Ret();
+        private List<Instruction> ParseRet(string _) {
+            List<Instruction> insts =
+            [
+                new Instruction.Ret()
+            ];
+
+            if (loop_name != null) 
+            {
+                insts.Insert(0, new Instruction.CmpOp(loop_comp, loop_name));
+            }
+
+            return insts;
+        }
 
         private List<Instruction> ParseCallFunc(string line)
         {
@@ -152,14 +167,16 @@ namespace lapis.parser
             return new Instruction.Asm(code);
         }
 
-        private List<Instruction> ParseIf(string line)
+        private List<Instruction> ParseControlFlow(string line)
         {
             string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string keyword = split[0];
             var op_map = CmpOperations.Map();
 
             var op1_ptr = varMap.GetVarPtr(Consts.Default_temp_operand1);
             var op2_ptr = varMap.GetVarPtr(Consts.Default_temp_operand2);
 
+            Console.WriteLine(split[1]);
             var (ext1, operand1) = ParseRawValue
             (
                 Types.Type.Byte, 
@@ -174,7 +191,7 @@ namespace lapis.parser
                 split[3]
             );
             string op = split[2];
-            
+
             ECmpOperations? op_val_nullable = op_map[op];
             ECmpOperations op_val = ECmpOperations.Je;
 
@@ -192,23 +209,24 @@ namespace lapis.parser
                 new Instruction.Func(label_name),
             ];
 
-            ext2 =
-            [
-                .. ext2,
-                new Instruction.Mov(op1_ptr, operand1),
-                new Instruction.Mov(op2_ptr, operand2),
-            ];
-
             if (op1 != split[1] || op2 != split[3])
             {
-                insts = [
+                insts = 
+                [
                     .. ext1,
                     .. ext2,
-                    new Instruction.Cmp(op1_ptr, op2_ptr), 
+                    new Instruction.Cmp(operand1, operand2), 
                     .. insts
                 ];
+
                 op1 = split[1];
                 op2 = split[3];
+            }
+
+            if (keyword == Consts.Token_unt) 
+            {
+                loop_name = label_name;
+                loop_comp = op_val;
             }
 
             return insts;
@@ -255,10 +273,11 @@ namespace lapis.parser
                         insts.Add(ParseAsmDecr(line));
                         break;
                     case Consts.Token_ret:
-                        insts.Add(ParseRet(line));
+                        insts.AddRange(ParseRet(line));
                         break;
+                    case Consts.Token_unt:
                     case Consts.Token_if:
-                        insts.AddRange(ParseIf(line));
+                        insts.AddRange(ParseControlFlow(line));
                         break;
                     case Consts.Token_include:
                         insts.AddRange(ParseInclude(line));

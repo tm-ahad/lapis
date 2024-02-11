@@ -48,7 +48,7 @@ namespace lapis.Helpers
             }
             else
             {
-                Console.WriteLine("The specified file does not exist.");
+                throw new Exception("Lapis is not installed on your machine.");
             }
 
             return res.ToString();
@@ -56,39 +56,24 @@ namespace lapis.Helpers
 
         public string FetchPrefixes()
         {
-            string jsonUrl = $"{home_path}/Asm_prefix/prefixes.json";
-            string jsonContent = ReadFile(jsonUrl);
+            StringBuilder res = new StringBuilder();
 
-            StringBuilder concatenatedContents = new StringBuilder();
+            string dir = $"{home_path}/essentials";
 
-            try
+            if (!Directory.Exists(dir))
             {
-                JsonDocument jsonDocument = JsonDocument.Parse(jsonContent);
-                JsonElement root = jsonDocument.RootElement;
-
-                if (root.TryGetProperty("prefixes", out JsonElement prefixesArray))
-                {
-                    foreach (JsonElement prefixToken in prefixesArray.EnumerateArray())
-                    {
-                        string fileName = prefixToken.GetString();
-                        string fileUrl = $"{home_path}/Asm_prefix/{fileName}";
-
-                        string fileContent = ReadFile(fileUrl);
-                        concatenatedContents.AppendLine(fileContent);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Property 'prefixes' not found in JSON.");
-                }
-            }
-            catch (JsonException ex)
-            {
-                Console.WriteLine($"Error parsing JSON: {ex.Message}");
-                throw;
+                throw new Exception("Lapis is not installed on your machine.");
             }
 
-            return concatenatedContents.ToString();
+            string[] files = Directory.GetFiles(dir);
+
+            foreach (string file in files)
+            {
+                string content = File.ReadAllText(file);
+                res.AppendLine(content);
+            }
+
+            return res.ToString();
         }
         public string GetStdLib(string name)
         {

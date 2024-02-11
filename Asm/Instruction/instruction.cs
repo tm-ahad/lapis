@@ -1,5 +1,4 @@
 ﻿using lapis.Helpers;
-using System.Reflection.Emit;
 
 namespace lapis.Asm.Inst
 {
@@ -139,8 +138,21 @@ namespace lapis.Asm.Inst
             public override string ToString() => $"cmp {a},{b}";
         }
 
+        public sealed class Jmp : Instruction
+        {
+            public string label;
+
+            public Jmp(string label)
+            {
+                this.label = label;
+            }
+
+            public override string ToString() => $"jmp {label}";
+        }
+
         public sealed class Ret : Instruction
         {
+            public Ret() { }
             public override string ToString() => "ret";
         }
     }
