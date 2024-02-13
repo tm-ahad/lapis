@@ -12,16 +12,18 @@
         public const string Token_asm = "asm";
         public const string Token_ret = "ret";
         public const string Token_unt = "unt";
+        public const string Token_std = "std";
         public const string Token_if = "@if";
         public const string Token_expr = "expr";
         public const string Token_value = "lit";
         public const string Token_comment = "###";
         public const string Token_include = "inc";
+        public const string Token_self = "self";
 
         //Config
-        public const string Default_temp_index = "__temp_index";
-        public const string Default_temp_operand1 = "__temp_operand1";
-        public const string Default_temp_operand2 = "__temp_operand2";
+        public const string Default_operand1 = "__TEMP_OPERAND1";
+        public const string Default_operand2 = "__TEMP_OPERAND2";
         public const string Default_func_res = "res";
+        public const string Default_index = "__TEMP_INDEX";
     }
 }

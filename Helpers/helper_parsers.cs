@@ -107,7 +107,7 @@ namespace lapis.Helpers
                             Types.Type.U64
                         );
                         var ind_ptr = ind_var.Ptr;
-                        varMap.SetVar(Consts.Default_temp_index, ind_var);
+                        varMap.SetVar(Consts.Default_index, ind_var);
 
                         Var arr = varMap.GetVar(prev);
                         string arr_head = arr.Head;
@@ -118,7 +118,7 @@ namespace lapis.Helpers
 
                         (List<Instruction> extra, string _name) = ParseRawValue(
                             Types.Type.U64,
-                            Consts.Default_temp_index, 
+                            Consts.Default_index, 
                             expr.Substring(curr_ind)
                         );
 

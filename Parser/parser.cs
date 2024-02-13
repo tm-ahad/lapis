@@ -9,7 +9,7 @@ namespace lapis.parser
     {
         private new readonly FuncMap funcMap = new();
         private readonly Fetcher fetcher = new();
-        private string? loop_name = string.Empty;
+        private string loop_name = string.Empty;
         private ECmpOperations loop_comp = 0;
         private readonly int token_len = 3;
         private string? op1 = null;
@@ -72,13 +72,14 @@ namespace lapis.parser
             return insts;
         }
 
-        private List<Instruction> ParseRet(string _) {
+        private List<Instruction> ParseRet(string _) 
+        {
             List<Instruction> insts =
             [
                 new Instruction.Ret()
             ];
 
-            if (loop_name != null) 
+            if (loop_name != string.Empty) 
             {
                 insts.Insert(0, new Instruction.CmpOp(loop_comp, loop_name));
             }
@@ -95,7 +96,6 @@ namespace lapis.parser
             string[] parms = split[2].Trim().Split(",");
 
             List<Instruction> insts = new List<Instruction>();
-
             var func_args = funcMap.GetFuncParams(func_name);
 
             for (int i = 0; i < func_args.Count; i++)
@@ -126,10 +126,14 @@ namespace lapis.parser
         {
             uint init_ptr_offset = Gen.GetCurr();
             string[] split = line.Split(' ');
-            string name = split[2];
+            string name = split[2].Trim();
             string parms = string.Join(' ', split.Skip(3).ToArray());
 
             byte ret_type = Types.Type.FromString(split[1]);
+
+            Var res = varMap.GetVar(Consts.Default_func_res);
+            res.Type = ret_type;
+            varMap.SetVar(Consts.Default_index, res);
 
             List<Tuple<string, byte>> args = new List<Tuple<string, byte>>();
 
@@ -173,21 +177,20 @@ namespace lapis.parser
             string keyword = split[0];
             var op_map = CmpOperations.Map();
 
-            var op1_ptr = varMap.GetVarPtr(Consts.Default_temp_operand1);
-            var op2_ptr = varMap.GetVarPtr(Consts.Default_temp_operand2);
+            var op1_ptr = varMap.GetVarPtr(Consts.Default_operand1);
+            var op2_ptr = varMap.GetVarPtr(Consts.Default_operand2);
 
-            Console.WriteLine(split[1]);
             var (ext1, operand1) = ParseRawValue
             (
-                Types.Type.Byte, 
-                Consts.Default_temp_operand1,
+                Types.Type.Byte,
+                Consts.Default_operand1,
                 split[1]
             );
 
             var (ext2, operand2) = ParseRawValue
             (
                 Types.Type.Byte,
-                Consts.Default_temp_operand2,
+                Consts.Default_operand2,
                 split[3]
             );
             string op = split[2];
@@ -232,16 +235,24 @@ namespace lapis.parser
             return insts;
         }
 
-        public List<Instruction> ParseInclude(string line)
+        private List<Instruction> ParseInclude(string line)
         {
             string[] split = line.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-            string name = split[1];
+            string include = split[1];
+            string[] inc_split = include.Split('@', 2, StringSplitOptions.RemoveEmptyEntries);
 
-            string code = fetcher.GetStdLib(name);
-            Parser parser = new Parser();
+            string include_type = inc_split[0];
+            string include_path = inc_split[1];
 
-            List<Instruction> insts = parser.Parse(code);
-            return insts;
+            switch (include_type) 
+            {
+                case Consts.Token_self:
+                    return Include.Self(include_path);
+                case Consts.Token_std:
+                    return Include.Std(include_path);
+                default:
+                    throw new Exception($"Error: invalid include type '{include_type}'");
+            }
         }
 
         public List<Instruction> Parse(string code)

@@ -1,6 +1,5 @@
 ﻿using lapis.Asm.Ptr;
 using lapis.Constants;
-using System;
 
 namespace lapis.Helpers
 {
@@ -14,9 +13,9 @@ namespace lapis.Helpers
             Var temp_op2 = new Var(Gen.Generate(1), Types.Type.Byte);
             Var res = new Var(Gen.Generate(8), 255);
 
-            map[Consts.Default_temp_operand1] = temp_op1;
-            map[Consts.Default_temp_operand2] = temp_op2;
-            map[Consts.Default_temp_index] = temp_index;
+            map[Consts.Default_operand1] = temp_op1;
+            map[Consts.Default_operand2] = temp_op2;
+            map[Consts.Default_index] = temp_index;
             map[Consts.Default_func_res] = res;
         }
 
