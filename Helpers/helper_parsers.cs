@@ -15,6 +15,7 @@ namespace lapis.Helpers
             this.varMap = varMap;
             this.funcMap = funcMap;
         }
+
         protected Tuple<List<Instruction>, string> ParseRawValue(byte type, string name, string raw_val)
         {
             string ptr = varMap.GetVarPtr(name);

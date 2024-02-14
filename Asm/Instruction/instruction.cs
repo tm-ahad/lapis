@@ -18,6 +18,20 @@ namespace lapis.Asm.Inst
             public override string ToString() => $"mov {To},{From}";
         }
 
+        public sealed class Copy : Instruction
+        {
+            public string To;
+            public string From;
+
+            public Copy(string To, string From)
+            {
+                this.To = To;
+                this.From = From;
+            }
+
+            public override string ToString() => $"mov eax,{From}\nmov {To}, eax";
+        }
+
         public sealed class Add : Instruction
         {
             public string To;

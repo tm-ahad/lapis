@@ -33,7 +33,7 @@ namespace lapis.parser
 
             if (name != ptr)
             {
-                insts.Insert(0, new Instruction.Mov(ptr, name));
+                insts.Insert(0, new Instruction.Copy(ptr, name));
             }
 
             return insts;
@@ -65,7 +65,7 @@ namespace lapis.parser
 
             var insts = new List<Instruction>
             {
-                new Instruction.Mov(ptr, val)
+                new Instruction.Copy(ptr, val)
             };
             insts.AddRange(extra);
 
@@ -113,7 +113,7 @@ namespace lapis.parser
                 string param = parms[i];
 
                 var (ext, val) = ParseRawValue(arg_type, arg_name, param);
-                insts.Add(new Instruction.Mov(arg_ptr, val));
+                insts.Add(new Instruction.Copy(arg_ptr, val));
                 insts.AddRange(ext);
             }
             insts.Add(new Instruction.Call(func_name));

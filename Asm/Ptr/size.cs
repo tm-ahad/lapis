@@ -13,11 +13,11 @@
         {
             switch (size)
             {
-                case BYTE: return "BYTE";
-                case WORD: return "WORD";
-                case DWORD: return "DWORD";
-                case QWORD: return "QWORD";
-                case UNKNOWN: return "BYTE";
+                case BYTE: return "byte";
+                case WORD: return "word";
+                case DWORD: return "dword";
+                case QWORD: return "qword";
+                case UNKNOWN: return "byte";
             }
 
             throw new Exception($"Error: invalid size {size}");

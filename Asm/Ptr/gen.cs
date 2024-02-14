@@ -14,7 +14,7 @@ namespace lapis.Asm.Ptr
 
         public static string Make(byte type, string head) 
         {
-            return $"{PtrSize.ToString(Types.Type.Size(type))} PTR [rbp-{head}]";
+            return $"{PtrSize.ToString(Types.Type.Size(type))} [rbp-{head}]";
         }
 
         public static uint GetCurr() => Curr;
