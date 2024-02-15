@@ -1,10 +1,10 @@
 ﻿using lapis.Asm.Ptr;
+using System.Reflection;
 
 namespace lapis.Helpers
 {
     public class Var
     {
-        public string Ptr = string.Empty;
         public string Head;
         public byte Type;
 
@@ -12,7 +12,11 @@ namespace lapis.Helpers
         {
             Head = head;
             Type = type;
-            Ptr = $"{PtrSize.ToString(Types.Type.Size(type))} PTR [rbp-{head}]";
+        }
+
+        public string Pointer() 
+        {
+            return $"{PtrSize.ToString(Types.Type.Size(Type))} [rbp-{Head}]";
         }
     }
 }

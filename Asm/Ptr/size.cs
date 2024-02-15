@@ -13,11 +13,25 @@
         {
             switch (size)
             {
+                case UNKNOWN:
                 case BYTE: return "byte";
                 case WORD: return "word";
                 case DWORD: return "dword";
                 case QWORD: return "qword";
-                case UNKNOWN: return "byte";
+            }
+
+            throw new Exception($"Error: invalid size {size}");
+        }
+
+        public static string CopyRegisterName(byte size) 
+        {
+            switch (size)
+            {
+                case UNKNOWN:
+                case BYTE: return "al";
+                case WORD: return "ax";
+                case DWORD: return "eax";
+                case QWORD: return "rax";
             }
 
             throw new Exception($"Error: invalid size {size}");

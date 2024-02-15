@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace lapis.Asm.Ptr
+﻿namespace lapis.Asm.Ptr
 {
     public class Gen
     {

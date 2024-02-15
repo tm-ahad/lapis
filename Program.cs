@@ -1,12 +1,14 @@
-﻿using lapis.Asm.Gen;
+﻿using lapis.Asm.Assembler;
+using lapis.Asm.Gen;
 using lapis.Asm.Inst;
+using lapis.Link;
 using lapis.parser; 
 
 namespace lapis
 {
     class Lapis
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             if (args.Length < 2)
             {
@@ -14,24 +16,27 @@ namespace lapis
                 return;
             }
 
-            string input_file = args[0];
-            string output_file = args[1];
+            string inputFile = args[0];
+            string outputFile = args[1];
 
             Parser parser = new Parser();
+            Assembler asm = new Assembler();
+            Linker linker = new Linker();
 
             try
             {
-                string fileContents = File.ReadAllText(input_file);
+                string fileContents = File.ReadAllText(inputFile);
                 List<Instruction> insts = parser.Parse(fileContents);
                 string asm_out = Gen.Generate(insts);
 
-                File.WriteAllText(output_file, asm_out);
+                File.WriteAllText($"{outputFile}.asm", asm_out);
 
-                Console.WriteLine($"Compiled {input_file} to {output_file}");
+                asm.Assemble(outputFile);
+                linker.Link(outputFile);
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine("File not found: " + input_file);
+                Console.WriteLine("File not found: " + inputFile);
             }
             catch (Exception ex)
             {

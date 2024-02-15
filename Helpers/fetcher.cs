@@ -1,24 +1,30 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 
 namespace lapis.Helpers
 {
     public class Fetcher
     {
-        string home_path;
+        PlatformID platformId;
+        string homePath;
+        string shell;
 
         public Fetcher()
         {
             PlatformID platform = Environment.OSVersion.Platform;
+            platformId = platform;
 
             switch (platform)
             {
                 case PlatformID.Win32NT:
-                    home_path = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.lapis";
+                    homePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.lapis";
+                    shell = "cmd.exe";
                     break;
                 case PlatformID.Unix:
                 case PlatformID.MacOSX:
-                    home_path = $"{Environment.GetEnvironmentVariable("HOME")}/.lapis";
+                    homePath = $"{Environment.GetEnvironmentVariable("HOME")}/.lapis";
+                    shell = "/bin/bash";
                     break;
                 default:
                     throw new Exception($"Unsupported platform {platform}");
@@ -54,11 +60,41 @@ namespace lapis.Helpers
             return res.ToString();
         }
 
+        public void ExecuteCommand(string command) 
+        {
+            Process process = new Process();
+
+            process.StartInfo.FileName = shell;
+
+            if (platformId == PlatformID.Win32NT)
+            {
+                process.StartInfo.Arguments = $"/c \"{command}\"";
+            }
+            else 
+            {
+                process.StartInfo.Arguments = $"-c \"{command}\"";
+            }
+
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardError = true;
+
+            process.Start();
+            process.WaitForExit();
+
+            string error = process.StandardError.ReadToEnd();
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                Console.WriteLine("Error:");
+                Console.WriteLine(error);
+            }
+        }
+
         public string FetchPrefixes()
         {
             StringBuilder res = new StringBuilder();
 
-            string dir = $"{home_path}/essentials";
+            string dir = $"{homePath}/essentials";
 
             if (!Directory.Exists(dir))
             {
@@ -77,7 +113,7 @@ namespace lapis.Helpers
         }
         public string GetStdLib(string name)
         {
-            string path = $"{home_path}/lib/{name}.lps";
+            string path = $"{homePath}/lib/{name}.lps";
             return ReadFile(path);
         }
     }

@@ -22,7 +22,7 @@ namespace lapis.Helpers
 
             string val = string.Empty;
             List<Instruction> inst = new List<Instruction>();
-            string[] spl = raw_val.Split("@", 2);
+            string[] spl = raw_val.Split("@", 2, StringSplitOptions.RemoveEmptyEntries);
 
             string value_type = spl[0];
             string value = spl[1];
@@ -55,7 +55,7 @@ namespace lapis.Helpers
             string[] split = Regex.Split(expr, pattern);
 
             string first = split[0];
-            byte first_t = varMap.GetVarType(first);
+            byte first_t = varMap.GetVarType(first, null);
             bool skipFirst = true;
             int curr_ind = 0;
 
@@ -107,7 +107,7 @@ namespace lapis.Helpers
                             Gen.Generate(Types.Type.Size(Types.Type.U64)), 
                             Types.Type.U64
                         );
-                        var ind_ptr = ind_var.Ptr;
+                        var ind_ptr = ind_var.Pointer();
                         varMap.SetVar(Consts.Default_index, ind_var);
 
                         Var arr = varMap.GetVar(prev);

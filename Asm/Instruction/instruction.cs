@@ -1,4 +1,7 @@
-﻿using lapis.Helpers;
+﻿using lapis.Asm.Ptr;
+using lapis.Constants;
+using lapis.Helpers;
+using System.Reflection.Metadata.Ecma335;
 
 namespace lapis.Asm.Inst
 {
@@ -22,14 +25,29 @@ namespace lapis.Asm.Inst
         {
             public string To;
             public string From;
+            public byte ToSize;
+            public byte FromSize;
 
-            public Copy(string To, string From)
+            public Copy(string To, byte ToSize, string From, byte FromSize)
             {
                 this.To = To;
                 this.From = From;
+                this.ToSize = ToSize;
+                this.FromSize = FromSize;
             }
 
-            public override string ToString() => $"mov eax,{From}\nmov {To}, eax";
+            public override string ToString() {
+                string crn = PtrSize.CopyRegisterName(ToSize);
+
+                if (ToSize > FromSize)
+                {
+                    return $"movzx {crn},{From}\nmov {To}, {crn}";
+                }
+                else 
+                {
+                    return $"mov {crn},{From}\nmov {To}, {crn}";
+                }
+            }
         }
 
         public sealed class Add : Instruction

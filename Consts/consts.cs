@@ -30,6 +30,7 @@
         public const string Default_index = "__TEMP_INDEX";
 
         //Assembler config
+
         public const string flags = "-felf64";
     }
 }

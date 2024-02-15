@@ -25,19 +25,22 @@ namespace lapis.parser
 
             Var varA = varMap.GetVar(a);
             byte type = varA.Type;
-            string ptr = varA.Ptr;
+            byte size = Types.Type.Size(type);
+            string ptr = varA.Pointer();
 
             var (extra, name) = ParseRawValue(type, a, b);
+            byte nameSize = Types.Type.Size(varMap.GetVarType(name, type));
 
             List<Instruction> insts = extra;
 
             if (name != ptr)
             {
-                insts.Insert(0, new Instruction.Copy(ptr, name));
+                insts.Insert(0, new Instruction.Copy(ptr, size, name, nameSize));
             }
 
             return insts;
         }
+
         private List<Instruction> ParseVarDecr(string line)
         {
             string[] split = line.Split(' ');
@@ -49,7 +52,8 @@ namespace lapis.parser
 
             string ptr = Gen.Generate(size);
             Var var = new Var(ptr, Types.Type.FromString(type));
-            ptr = var.Ptr;
+            ptr = var.Pointer();
+
             varMap.SetVar(name, var);
 
             if (size == PtrSize.UNKNOWN)
@@ -63,9 +67,15 @@ namespace lapis.parser
                 raw_val
             );
 
+            byte _size = Types.Type.Size(var.Type);
+            byte valSize = Types.Type.Size(varMap.GetVarType(val, var.Type));
+
+            Console.WriteLine(_size);
+            Console.WriteLine(varMap.GetVarType(val, _size));
+
             var insts = new List<Instruction>
             {
-                new Instruction.Copy(ptr, val)
+                new Instruction.Copy(ptr, _size, val, valSize)
             };
             insts.AddRange(extra);
 
@@ -86,7 +96,7 @@ namespace lapis.parser
 
             return insts;
         }
-
+        
         private List<Instruction> ParseCallFunc(string line)
         {
             uint init_ptr_offset = Gen.GetCurr();
@@ -108,12 +118,17 @@ namespace lapis.parser
                 var arg = func_args[i];
                 string arg_name = arg.Item1;
                 byte arg_type = arg.Item2;
-                string arg_ptr = varMap.GetVarPtr(arg_name);
+
+                Var _arg = varMap.GetVar(arg_name);
+                string arg_ptr = _arg.Pointer();
+                byte arg_size = Types.Type.Size(_arg.Type);
 
                 string param = parms[i];
 
                 var (ext, val) = ParseRawValue(arg_type, arg_name, param);
-                insts.Add(new Instruction.Copy(arg_ptr, val));
+                byte valSize = Types.Type.Size(varMap.GetVarType(val, _arg.Type));
+
+                insts.Add(new Instruction.Copy(arg_ptr, arg_size, val, valSize));
                 insts.AddRange(ext);
             }
             insts.Add(new Instruction.Call(func_name));

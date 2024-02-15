@@ -9,8 +9,8 @@ namespace lapis.Helpers
         public VarMap() 
         {
             Var temp_index = new Var(Gen.Generate(4), Types.Type.U16);
-            Var temp_op1 = new Var(Gen.Generate(1), Types.Type.Byte);
-            Var temp_op2 = new Var(Gen.Generate(1), Types.Type.Byte);
+            Var temp_op1 = new Var(Gen.Generate(2), Types.Type.Byte);
+            Var temp_op2 = new Var(Gen.Generate(2), Types.Type.Byte);
             Var res = new Var(Gen.Generate(8), 255);
 
             map[Consts.Default_operand1] = temp_op1;
@@ -23,7 +23,7 @@ namespace lapis.Helpers
         {
             if (map.ContainsKey(var_name)) 
             {
-                return map[var_name].Ptr;
+                return map[var_name].Pointer();
             }
             else
             {
@@ -43,15 +43,19 @@ namespace lapis.Helpers
             }
         }
 
-        public byte GetVarType(string var_name)
+        public byte GetVarType(string var_name, byte? def)
         {
             if (map.ContainsKey(var_name))
             {
                 return map[var_name].Type;
             }
-            else
+            else if (def == null)
             {
                 throw new Exception($"Error: var {var_name} not found");
+            }
+            else 
+            {
+                return (byte)def;
             }
         }
         public Var GetVar(string var_name)
