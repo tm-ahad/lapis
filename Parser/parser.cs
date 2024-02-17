@@ -70,13 +70,11 @@ namespace lapis.parser
             byte _size = Types.Type.Size(var.Type);
             byte valSize = Types.Type.Size(varMap.GetVarType(val, var.Type));
 
-            Console.WriteLine(_size);
-            Console.WriteLine(varMap.GetVarType(val, _size));
-
             var insts = new List<Instruction>
             {
                 new Instruction.Copy(ptr, _size, val, valSize)
             };
+
             insts.AddRange(extra);
 
             return insts;

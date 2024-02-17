@@ -32,5 +32,13 @@
         //Assembler config
 
         public const string flags = "-felf64";
+
+        //Assembly config
+
+        public const string copyRegister8 = "bl";
+        public const string copyRegister16 = "ax";
+        public const string copyRegister32 = "ecx";
+        public const string copyRegister64 = "rdx";
+
     }
 }

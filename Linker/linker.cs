@@ -13,7 +13,7 @@ namespace lapis.Link
 
         public void Link(string name) 
         {
-            string linkCommand = $"ldrdf {name}.o -o {name}";
+            string linkCommand = $"ld {name}.o -o {name}";
             fetcher.ExecuteCommand(linkCommand);
         }
     }

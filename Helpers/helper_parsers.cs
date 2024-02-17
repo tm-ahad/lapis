@@ -36,7 +36,7 @@ namespace lapis.Helpers
                     val = Types.Type.Value(value, type);
                     break;
                 case Consts.Token_expr:
-                    var (ext, b) = ParseExpr(ptr, value);
+                    var (ext, b) = ParseExpr(ptr, Types.Type.Size(type), value);
                     val = b;
                     inst = ext;
                     break;
@@ -47,7 +47,7 @@ namespace lapis.Helpers
             return new Tuple<List<Instruction>, string>(inst, val);
         }
 
-        protected Tuple<List<Instruction>, string> ParseExpr(string name, string expr)
+        protected Tuple<List<Instruction>, string> ParseExpr(string name, byte nameSize, string expr)
         {
             string pattern = @"(?=[*+-/:])";
 
@@ -72,6 +72,8 @@ namespace lapis.Helpers
                 }
 
                 string num = element.Substring(1);
+                byte numSize = varMap.GetVarType(num, nameSize);
+
                 switch (element[0])
                 {
                     case '+':
@@ -91,14 +93,14 @@ namespace lapis.Helpers
                     case '*':
                         if (Types.Type.isNumber(first_t))
                         {
-                            insts.Add(new Instruction.Mul(name, num));
+                            insts.Add(new Instruction.Mul(name, nameSize, num, numSize));
                             break;
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
                     case '/':
                         if (Types.Type.isNumber(first_t))
                         {
-                            insts.Add(new Instruction.Div(name, num));
+                            insts.Add(new Instruction.Div(name, nameSize, num, numSize));
                             break;
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
@@ -119,7 +121,7 @@ namespace lapis.Helpers
 
                         (List<Instruction> extra, string _name) = ParseRawValue(
                             Types.Type.U64,
-                            Consts.Default_index, 
+                            Consts.Default_index,
                             expr.Substring(curr_ind)
                         );
 

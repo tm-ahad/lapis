@@ -1,4 +1,6 @@
-﻿namespace lapis.Asm.Ptr
+﻿using lapis.Constants;
+
+namespace lapis.Asm.Ptr
 {
     public class PtrSize
     {
@@ -28,10 +30,10 @@
             switch (size)
             {
                 case UNKNOWN:
-                case BYTE: return "al";
-                case WORD: return "ax";
-                case DWORD: return "eax";
-                case QWORD: return "rax";
+                case BYTE: return Consts.copyRegister8;
+                case WORD: return Consts.copyRegister16;
+                case DWORD: return Consts.copyRegister32;
+                case QWORD: return Consts.copyRegister64;
             }
 
             throw new Exception($"Error: invalid size {size}");
