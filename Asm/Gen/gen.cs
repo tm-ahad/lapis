@@ -1,4 +1,5 @@
 ﻿using lapis.Asm.Inst;
+using lapis.Constants;
 using lapis.Helpers;
 using System.Text;
 
@@ -17,7 +18,12 @@ namespace lapis.Asm.Gen
                 main.AppendLine(inst.ToString());
             }
 
-            return $"section .text\nglobal _start\n{prefixes}_start:\n{main}jmp exit";
+            return $"format {Consts.exeFormat} executable 3\n" +
+                $"segment readable executable\n"+
+                $"entry {Consts.entry}\n" + 
+                $"{prefixes}\n"+
+                $"{Consts.entry}:\n{main}"+
+                $"jmp {Consts.exitLabel}";
         }
     }
 }

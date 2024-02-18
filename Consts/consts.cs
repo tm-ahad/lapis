@@ -31,14 +31,19 @@
 
         //Assembler config
 
-        public const string flags = "-felf64";
+        public const string exeFormat = "ELF64";
 
         //Assembly config
+
+        public const string assembler = "fasm";
 
         public const string copyRegister8 = "bl";
         public const string copyRegister16 = "ax";
         public const string copyRegister32 = "ecx";
         public const string copyRegister64 = "rdx";
+
+        public const string entry = "main";
+        public const string exitLabel = "exit";
 
     }
 }
