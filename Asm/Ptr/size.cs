@@ -25,18 +25,17 @@ namespace lapis.Asm.Ptr
             throw new Exception($"Error: invalid size {size}");
         }
 
-        public static string CopyRegisterName(byte size) 
+        public static string CopyRegisterName(byte size, byte index) 
         {
-            switch (size)
+            switch (size) 
             {
-                case UNKNOWN:
-                case BYTE: return Consts.copyRegister8;
-                case WORD: return Consts.copyRegister16;
-                case DWORD: return Consts.copyRegister32;
-                case QWORD: return Consts.copyRegister64;
+                case BYTE: return Consts.coupleRegister8[index];
+                case WORD: return Consts.coupleRegister16[index];
+                case DWORD: return Consts.coupleRegister32[index];
+                case QWORD: return Consts.coupleRegister64[index];
             }
 
-            throw new Exception($"Error: invalid size {size}");
+            return "B.A.L";
         }
     }
 }

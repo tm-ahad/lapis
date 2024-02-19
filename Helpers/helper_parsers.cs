@@ -16,7 +16,7 @@ namespace lapis.Helpers
             this.funcMap = funcMap;
         }
 
-        protected Tuple<List<Instruction>, string> ParseRawValue(byte type, string name, string raw_val)
+        protected Tuple<List<Instruction>, string, string> ParseRawValue(byte type, string name, string raw_val)
         {
             string ptr = varMap.GetVarPtr(name);
 
@@ -44,15 +44,20 @@ namespace lapis.Helpers
                     throw new Exception($"Error: invalid value type '{value_type}'");
             }
 
-            return new Tuple<List<Instruction>, string>(inst, val);
+            return new Tuple<List<Instruction>, string, string>(inst, val, value_type);
         }
 
         protected Tuple<List<Instruction>, string> ParseExpr(string name, byte nameSize, string expr)
         {
             string pattern = @"(?=[*+-/:])";
 
-            List<Instruction> insts = new List<Instruction>();
             string[] split = Regex.Split(expr, pattern);
+            string resRegister = PtrSize.CopyRegisterName(nameSize, 0);
+
+            List<Instruction> insts =
+            [
+                new Instruction.Mov(resRegister, name)
+            ];
 
             string first = split[0];
             byte first_t = varMap.GetVarType(first, null);
@@ -72,36 +77,40 @@ namespace lapis.Helpers
                 }
 
                 string num = element.Substring(1);
-                byte numSize = varMap.GetVarType(num, nameSize);
 
                 switch (element[0])
                 {
                     case '+':
                         if (Types.Type.isNumber(first_t))
                         {
-                            insts.Add(new Instruction.Add(name, num));
+                            insts.Add(new Instruction.Add(resRegister, num));
                             break;
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
                     case '-':
                         if (Types.Type.isNumber(first_t))
                         {
-                            insts.Add(new Instruction.Sub(name, num));
+                            insts.Add(new Instruction.Sub(resRegister, num));
                             break;
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
                     case '*':
                         if (Types.Type.isNumber(first_t))
                         {
-                            insts.Add(new Instruction.Mul(name, nameSize, num, numSize));
+                            string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
+
+                            insts.Add(new Instruction.Mov(reg1, num));
+                            insts.Add(new Instruction.Mul(nameSize));
                             break;
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
                     case '/':
                         if (Types.Type.isNumber(first_t))
                         {
-                            insts.Add(new Instruction.Div(name, nameSize, num, numSize));
-                            break;
+                            string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
+
+                            insts.Add(new Instruction.Mov(reg1, num));
+                            insts.Add(new Instruction.Div(nameSize));
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
                     case ':':
@@ -119,7 +128,8 @@ namespace lapis.Helpers
                         byte element_type = (byte)(arr_type - Types.Type.Array);
                         byte element_type_size = Types.Type.Size(element_type);
 
-                        (List<Instruction> extra, string _name) = ParseRawValue(
+                        (List<Instruction> extra, string _name, string _) = ParseRawValue
+                        (
                             Types.Type.U64,
                             Consts.Default_index,
                             expr.Substring(curr_ind)
@@ -147,6 +157,8 @@ namespace lapis.Helpers
                 prev = num;
                 curr_ind += element.Length;
             }
+
+            insts.Add(new Instruction.Mov(name, resRegister));
 
             return new Tuple<List<Instruction>, string>
             (

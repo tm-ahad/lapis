@@ -8,7 +8,6 @@ namespace lapis.parser
     public class Parser : HelperParsers
     {
         private new readonly FuncMap funcMap = new();
-        private readonly Fetcher fetcher = new();
         private string loop_name = string.Empty;
         private ECmpOperations loop_comp = 0;
         private readonly int token_len = 3;
@@ -28,7 +27,7 @@ namespace lapis.parser
             byte size = Types.Type.Size(type);
             string ptr = varA.Pointer();
 
-            var (extra, name) = ParseRawValue(type, a, b);
+            var (extra, name, _) = ParseRawValue(type, a, b);
             byte nameSize = Types.Type.Size(varMap.GetVarType(name, type));
 
             List<Instruction> insts = extra;
@@ -61,7 +60,8 @@ namespace lapis.parser
                 return [];
             }
 
-            var (extra, val) = ParseRawValue(
+            var (extra, val, valType) = ParseRawValue
+            (
                 Types.Type.FromString(type),
                 name,
                 raw_val
@@ -70,10 +70,16 @@ namespace lapis.parser
             byte _size = Types.Type.Size(var.Type);
             byte valSize = Types.Type.Size(varMap.GetVarType(val, var.Type));
 
-            var insts = new List<Instruction>
+            var insts = new List<Instruction>();
+
+            if (valType == Consts.Token_value)
             {
-                new Instruction.Copy(ptr, _size, val, valSize)
-            };
+                insts.Add(new Instruction.Mov(ptr, val));
+            }
+            else 
+            {
+                insts.Add(new Instruction.Copy(ptr, _size, val, valSize));
+            }
 
             insts.AddRange(extra);
 
@@ -123,7 +129,7 @@ namespace lapis.parser
 
                 string param = parms[i];
 
-                var (ext, val) = ParseRawValue(arg_type, arg_name, param);
+                var (ext, val, _) = ParseRawValue(arg_type, arg_name, param);
                 byte valSize = Types.Type.Size(varMap.GetVarType(val, _arg.Type));
 
                 insts.Add(new Instruction.Copy(arg_ptr, arg_size, val, valSize));
@@ -193,14 +199,14 @@ namespace lapis.parser
             var op1_ptr = varMap.GetVarPtr(Consts.Default_operand1);
             var op2_ptr = varMap.GetVarPtr(Consts.Default_operand2);
 
-            var (ext1, operand1) = ParseRawValue
+            var (ext1, operand1, _) = ParseRawValue
             (
                 Types.Type.Byte,
                 Consts.Default_operand1,
                 split[1]
             );
 
-            var (ext2, operand2) = ParseRawValue
+            var (ext2, operand2, _) = ParseRawValue
             (
                 Types.Type.Byte,
                 Consts.Default_operand2,

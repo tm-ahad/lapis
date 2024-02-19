@@ -31,19 +31,22 @@
 
         //Assembler config
 
-        public const string exeFormat = "ELF64";
+        public const string exeFormat = "elf64";
+        public const string assembler = "fasm";
+        public const string assemblerOutputFileExtension = "obj";
 
         //Assembly config
 
-        public const string assembler = "fasm";
-
-        public const string copyRegister8 = "bl";
-        public const string copyRegister16 = "ax";
-        public const string copyRegister32 = "ecx";
-        public const string copyRegister64 = "rdx";
+        public static readonly string[] coupleRegister8 = ["bl", "dl"];
+        public static readonly string[] coupleRegister16 = ["ax", "cx"];
+        public static readonly string[] coupleRegister32 = ["eax", "edi"];
+        public static readonly string[] coupleRegister64 = ["r8", "r9"];
 
         public const string entry = "main";
         public const string exitLabel = "exit";
 
+        //Linker config
+
+        public const string linker = "ld";
     }
 }

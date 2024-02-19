@@ -35,7 +35,7 @@ namespace lapis.Asm.Inst
             }
 
             public override string ToString() {
-                string crn = PtrSize.CopyRegisterName(ToSize);
+                string crn = PtrSize.CopyRegisterName(ToSize, 0);
 
                 if (ToSize > FromSize)
                 {
@@ -78,45 +78,34 @@ namespace lapis.Asm.Inst
 
         public sealed class Mul : Instruction
         {
-            public string To;
-            public string From;
-            public byte ToSize;
-            public byte FromSize;
+            public byte size;
 
-            public Mul(string To, byte ToSize, string From, byte FromSize)
+            public Mul(byte size)
             {
-                this.To = To;
-                this.From = From;
-                this.ToSize = ToSize;
-                this.FromSize = FromSize;
+                this.size = size;
             }
 
             public override string ToString()
             {
-                var copyRegister = PtrSize.CopyRegisterName(ToSize);
-                return $"mov {copyRegister},{To}\nimul {copyRegister},{From}\nmov {To}, {copyRegister}";
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"imul {reg1},{reg2}";
             }
         }
-
         public sealed class Div : Instruction
         {
-            public string To;
-            public string From;
-            public byte ToSize;
-            public byte FromSize;
+            public byte size;
 
-            public Div(string To, byte ToSize, string From, byte FromSize)
+            public Div(byte size)
             {
-                this.To = To;
-                this.From = From;
-                this.ToSize = ToSize;
-                this.FromSize = FromSize;
+                this.size = size;
             }
 
             public override string ToString()
             {
-                var copyRegister = PtrSize.CopyRegisterName(ToSize);
-                return $"mov {copyRegister},{To}\nidiv {copyRegister},{From}\nmov {To}, {copyRegister}";
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"idiv {reg1},{reg2}";
             }
         }
 

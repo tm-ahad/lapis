@@ -1,6 +1,7 @@
 ﻿using lapis.Asm.Assembler;
 using lapis.Asm.Gen;
 using lapis.Asm.Inst;
+using lapis.Link;
 using lapis.parser; 
 
 namespace lapis
@@ -20,6 +21,7 @@ namespace lapis
 
             Parser parser = new Parser();
             Assembler asm = new Assembler();
+            Linker linker = new Linker();
 
             try
             {
@@ -30,6 +32,7 @@ namespace lapis
                 File.WriteAllText($"{outputFile}.asm", asm_out);
 
                 asm.Assemble(outputFile);
+                linker.Link(outputFile);
             }
             catch (FileNotFoundException)
             {

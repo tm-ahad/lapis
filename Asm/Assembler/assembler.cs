@@ -15,7 +15,7 @@ namespace lapis.Asm.Assembler
         public void Assemble(string name) 
         {
             string asmFile = $"{name}.asm";
-            string assembleCommand = $"{Consts.assembler} {asmFile}";
+            string assembleCommand = $"{Consts.assembler} {asmFile} -o {name}.{Consts.assemblerOutputFileExtension}";
 
             fetcher.ExecuteCommand(assembleCommand);
         }
