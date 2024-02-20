@@ -2,6 +2,7 @@
 using lapis.Asm.Ptr;
 using lapis.Constants;
 using lapis.Helpers;
+using Microsoft.VisualBasic;
 
 namespace lapis.parser
 {
@@ -22,22 +23,54 @@ namespace lapis.parser
             string a = split[1];
             string b = split[2];
 
-            Var varA = varMap.GetVar(a);
-            byte type = varA.Type;
-            byte size = Types.Type.Size(type);
-            string ptr = varA.Pointer();
+            string[] splA = a.Split(":", StringSplitOptions.RemoveEmptyEntries);
 
-            var (extra, name, _) = ParseRawValue(type, a, b);
-            byte nameSize = Types.Type.Size(varMap.GetVarType(name, type));
-
-            List<Instruction> insts = extra;
-
-            if (name != ptr)
+            if (splA.Length == 1)
             {
-                insts.Insert(0, new Instruction.Copy(ptr, size, name, nameSize));
-            }
+                Var varA = varMap.GetVar(a);
+                byte type = varA.Type;
+                byte size = Types.Type.Size(type);
+                string ptr = varA.Pointer();
 
-            return insts;
+                var (extra, name, _) = ParseRawValue(type, a, b);
+                byte nameSize = Types.Type.Size(varMap.GetVarType(name, type));
+
+                List<Instruction> insts = extra;
+
+                if (name != ptr)
+                {
+                    insts.Insert(0, new Instruction.Copy(ptr, size, name, nameSize));
+                }
+
+                return insts;
+            }
+            else 
+            {
+                a = splA[0];
+                string index = varMap.GetVarPtr(splA[1]);
+                string varAHead = varMap.GetVarHead(a);
+
+                byte aItemType = (byte)(varMap.GetVarType(a, null) - Types.Type.Array);
+                byte aItemSize = Types.Type.Size(aItemType);
+
+
+                string destHead = $"{varAHead} - {index}*{aItemSize}";
+
+                string destPtr = Gen.Make(aItemType, destHead);
+                varMap.SetVar(Consts.Default_element, new Var(destHead, aItemType));
+
+                var (extra, name, _) = ParseRawValue(aItemType, Consts.Default_element, b);
+                byte nameSize = Types.Type.Size(varMap.GetVarType(name, aItemSize));
+
+                List<Instruction> insts = extra;
+
+                if (name != destPtr)
+                {
+                    insts.Insert(0, new Instruction.Copy(destPtr, aItemSize, name, nameSize));
+                }
+
+                return insts;
+            }
         }
 
         private List<Instruction> ParseVarDecr(string line)
@@ -55,17 +88,21 @@ namespace lapis.parser
 
             varMap.SetVar(name, var);
 
-            if (size == PtrSize.UNKNOWN)
-            {
-                return [];
-            }
-
             var (extra, val, valType) = ParseRawValue
             (
                 Types.Type.FromString(type),
                 name,
                 raw_val
             );
+
+            if (valType == Consts.Token_type)
+            {
+                return [];
+            }
+            else if (size == PtrSize.UNKNOWN)
+            {
+                throw new Exception("Error: expected value type 'type'");
+            }
 
             byte _size = Types.Type.Size(var.Type);
             byte valSize = Types.Type.Size(varMap.GetVarType(val, var.Type));
@@ -212,6 +249,17 @@ namespace lapis.parser
                 Consts.Default_operand2,
                 split[3]
             );
+
+            var op1Size = PtrSize.ExtractSizeFromPtr(operand1);
+            var op2Size = PtrSize.ExtractSizeFromPtr(operand2);
+
+            if (op1Size != op2Size) 
+            {
+                throw new Exception("Error: operands are not the same size");
+            }
+
+            var REGISTER = PtrSize.CopyRegisterName(op2Size, 0);
+
             string op = split[2];
 
             ECmpOperations? op_val_nullable = op_map[op];
@@ -237,7 +285,8 @@ namespace lapis.parser
                 [
                     .. ext1,
                     .. ext2,
-                    new Instruction.Cmp(operand1, operand2), 
+                    new Instruction.Mov(REGISTER, operand2),
+                    new Instruction.Cmp(operand1, REGISTER), 
                     .. insts
                 ];
 

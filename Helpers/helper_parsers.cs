@@ -22,7 +22,7 @@ namespace lapis.Helpers
 
             string val = string.Empty;
             List<Instruction> inst = new List<Instruction>();
-            string[] spl = raw_val.Split("@", 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] spl = raw_val.Split("@", 2);
 
             string value_type = spl[0];
             string value = spl[1];
@@ -34,6 +34,9 @@ namespace lapis.Helpers
                     break;
                 case Consts.Token_value:
                     val = Types.Type.Value(value, type);
+                    break;
+                case Consts.Token_type:
+                    val = 0.ToString();
                     break;
                 case Consts.Token_expr:
                     var (ext, b) = ParseExpr(ptr, Types.Type.Size(type), value);

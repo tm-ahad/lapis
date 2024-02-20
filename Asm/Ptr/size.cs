@@ -25,6 +25,20 @@ namespace lapis.Asm.Ptr
             throw new Exception($"Error: invalid size {size}");
         }
 
+        public static byte FromString(string size)
+        {
+            switch (size)
+            {
+                case "unknown":
+                case "byte": return BYTE;
+                case "word": return WORD;
+                case "dword": return DWORD;
+                case "qword": return QWORD;
+            }
+
+            throw new Exception($"Error: invalid size {size}");
+        }
+
         public static string CopyRegisterName(byte size, byte index) 
         {
             switch (size) 
@@ -36,6 +50,12 @@ namespace lapis.Asm.Ptr
             }
 
             return "B.A.L";
+        }
+
+        public static byte ExtractSizeFromPtr (string ptr)
+        {
+            string ss = ptr.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries)[0];
+            return FromString(ss);
         }
     }
 }

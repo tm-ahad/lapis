@@ -21,13 +21,16 @@
         public const string Token_comment = "###";
         public const string Token_include = "inc";
         public const string Token_self = "self";
+        public const string Token_type = "type";
 
         // Built-in variables
 
         public const string Default_operand1 = "__TEMP_OPERAND1";
         public const string Default_operand2 = "__TEMP_OPERAND2";
-        public const string Default_func_res = "res";
         public const string Default_index = "__TEMP_INDEX";
+
+        public const string Default_element = "__TEMP_ELEMENT";
+        public const string Default_func_res = "res";
 
         //Assembler config
 
