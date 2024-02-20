@@ -186,8 +186,8 @@ namespace lapis.parser
 
         private Instruction ParseAsmDecr(string line)
         {
-            string code = line.Substring(token_len).Trim();
-            return new Instruction.Asm(code);
+            string asmLine = line.Substring(token_len).Trim();
+            return ParseAsmTemplate(asmLine);
         }
 
         private List<Instruction> ParseControlFlow(string line)

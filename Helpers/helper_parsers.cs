@@ -47,6 +47,24 @@ namespace lapis.Helpers
             return new Tuple<List<Instruction>, string, string>(inst, val, value_type);
         }
 
+        protected Instruction.Asm ParseAsmTemplate(string asm)
+        {
+            char tempChar = '$';
+            int tempCharLen = 1;
+            string pattern = $@"\{tempChar}.";
+
+            Regex regex = new Regex(pattern);
+            string newAsm = regex.Replace(asm, m =>
+            {
+                var val = m.Value.Substring(tempCharLen);
+                var ptr = varMap.GetVarPtr(val);
+
+                return ptr;
+            });
+
+            return new Instruction.Asm(newAsm);
+        }
+
         protected Tuple<List<Instruction>, string> ParseExpr(string name, byte nameSize, string expr)
         {
             string pattern = @"(?=[*+-/:])";
