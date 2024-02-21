@@ -14,7 +14,7 @@ namespace lapis.Link
 
         public void Link(string name) 
         {
-            string objFile = $"{name}.obj";
+            string objFile = $"{name}.{Consts.assemblerOutputFileExtension}";
             string linkCommand = $"{Consts.linker} {objFile} -o {name}";
             
             fetcher.ExecuteCommand(linkCommand);
