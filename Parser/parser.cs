@@ -372,7 +372,7 @@ namespace lapis.parser
             foreach (string line in propDecrLines) 
             {
                 var spl = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                byte propType = Types.Type.Size(Types.Type.FromString(spl.First()));
+                byte propType = Types.Type.FromString(spl.First());
                 string propName = spl[1].Trim();
 
                 props.Add(propName, propType);
