@@ -3,8 +3,15 @@ using lapis.Helpers;
 
 namespace lapis.Asm.Inst
 {
+    public interface OperatorInstruction: Instruction
+    {
+        public static char Operator = char.MinValue;
+    }
+
     public interface Instruction
     {
+        public string ToString();
+
         public sealed class Mov : Instruction
         {
             public string To;
@@ -48,36 +55,45 @@ namespace lapis.Asm.Inst
             }
         }
 
-        public sealed class Add : Instruction
+        public sealed class Add : OperatorInstruction
         {
-            public string To;
-            public string From;
+            public const char Operator = '+';
+            public byte size;
 
-            public Add(string To, string From)
+            public Add(byte size)
             {
-                this.To = To;
-                this.From = From;
+                this.size = size;
             }
 
-            public override string ToString() => $"add {To},{From}";
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"add {reg1},{reg2}";
+            }
         }
 
-        public sealed class Sub : Instruction
+        public sealed class Sub : OperatorInstruction
         {
-            public string To;
-            public string From;
+            public const char Operator = '-';
+            public byte size;
 
-            public Sub(string To, string From)
+            public Sub(byte size)
             {
-                this.To = To;
-                this.From = From;
+                this.size = size;
             }
 
-            public override string ToString() => $"sub {To},{From}";
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"sub {reg1},{reg2}";
+            }
         }
 
-        public sealed class Mul : Instruction
+        public sealed class Mul : OperatorInstruction
         {
+            public const char Operator = '*';
             public byte size;
 
             public Mul(byte size)
@@ -92,8 +108,10 @@ namespace lapis.Asm.Inst
                 return $"imul {reg1},{reg2}";
             }
         }
-        public sealed class Div : Instruction
+
+        public sealed class Div : OperatorInstruction
         {
+            public const char Operator = '/';
             public byte size;
 
             public Div(byte size)
@@ -183,6 +201,60 @@ namespace lapis.Asm.Inst
             }
 
             public override string ToString() => $"jmp {label}";
+        }
+
+        public sealed class And : OperatorInstruction
+        {
+            public const char Operator = '&';
+            public byte size;
+
+            public And(byte size)
+            {
+                this.size = size;
+            }
+
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"and {reg1},{reg2}";
+            }
+        }
+
+        public sealed class Or : OperatorInstruction
+        {
+            public const char Operator = '|';
+            public byte size;
+
+            public Or(byte size)
+            {
+                this.size = size;
+            }
+
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"or {reg1},{reg2}";
+            }
+        }
+
+        public sealed class Xor : OperatorInstruction
+        {
+            public const char Operator = '^';
+            public byte size;
+
+            public Xor(byte size)
+            {
+                this.size = size;
+            }
+
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"xor {reg1},{reg2}";
+            }
         }
 
         public sealed class Ret : Instruction

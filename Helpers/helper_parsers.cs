@@ -1,6 +1,7 @@
 ﻿using lapis.Asm.Inst;
 using lapis.Asm.Ptr;
 using lapis.Constants;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace lapis.Helpers
@@ -70,7 +71,18 @@ namespace lapis.Helpers
 
         protected Tuple<List<Instruction>, string> ParseExpr(string name, byte nameSize, string expr)
         {
-            string pattern = @"(?=[*+-/:])";
+            char indexingOperator = ':';
+            string pattern =
+            $@"(?=[{
+                $"{Instruction.Mul.Operator}" +
+                $"{Instruction.Add.Operator}" +
+                $"{Instruction.Sub.Operator}" +
+                $"{Instruction.Div.Operator}" +
+                $"{Instruction.And.Operator}" +
+                $"{Instruction.Or.Operator}" +
+                $"{Instruction.Xor.Operator}" +
+                $"{indexingOperator}"
+            }])";
 
             string[] split = Regex.Split(expr, pattern);
             string resRegister = PtrSize.CopyRegisterName(nameSize, 0);
@@ -80,7 +92,7 @@ namespace lapis.Helpers
                 new Instruction.Mov(resRegister, name)
             ];
 
-            string first = split[0];
+            string first = split[0].Trim();
             byte first_t = varMap.GetVarType(first, null);
             bool skipFirst = true;
             int curr_ind = 0;
@@ -92,30 +104,40 @@ namespace lapis.Helpers
                 string element = split[i];
                 if (skipFirst)
                 {
-                    curr_ind += element.Length+1;
+                    curr_ind += element.Length + 1;
                     skipFirst = false;
                     continue;
                 }
 
-                string num = element.Substring(1);
+                string num = element.Substring(1).Trim();
 
                 switch (element[0])
                 {
-                    case '+':
+                    case Instruction.Add.Operator:
+
                         if (Types.Type.isNumber(first_t))
                         {
-                            insts.Add(new Instruction.Add(resRegister, num));
+                            string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
+
+                            insts.Add(new Instruction.Mov(reg1, num));
+                            insts.Add(new Instruction.Add(nameSize));
+                        }
+                        throw new Exception("Error: cannot apply arithmetical operation on non-number type");
+
+                    case Instruction.Sub.Operator:
+
+                        if (Types.Type.isNumber(first_t))
+                        {
+                            string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
+
+                            insts.Add(new Instruction.Mov(reg1, num));
+                            insts.Add(new Instruction.Sub(nameSize));
                             break;
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
-                    case '-':
-                        if (Types.Type.isNumber(first_t))
-                        {
-                            insts.Add(new Instruction.Sub(resRegister, num));
-                            break;
-                        }
-                        throw new Exception("Error: cannot apply arithmetical operation on non-number type");
-                    case '*':
+
+                    case Instruction.Mul.Operator:
+
                         if (Types.Type.isNumber(first_t))
                         {
                             string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
@@ -125,7 +147,9 @@ namespace lapis.Helpers
                             break;
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
-                    case '/':
+
+                    case Instruction.Div.Operator:
+
                         if (Types.Type.isNumber(first_t))
                         {
                             string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
@@ -134,7 +158,45 @@ namespace lapis.Helpers
                             insts.Add(new Instruction.Div(nameSize));
                         }
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
+
+                    case Instruction.And.Operator:
+
+                        if (Types.Type.isNumber(first_t))
+                        {
+                            string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
+
+                            insts.Add(new Instruction.Mov(reg1, num));
+                            insts.Add(new Instruction.And(nameSize));
+                            break;
+                        }
+                        throw new Exception("Error: cannot apply arithmetical operation on non-number type");
+
+                    case Instruction.Or.Operator:
+
+                        if (Types.Type.isNumber(first_t))
+                        {
+                            string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
+
+                            insts.Add(new Instruction.Mov(reg1, num));
+                            insts.Add(new Instruction.Or(nameSize));
+                            break;
+                        }
+                        throw new Exception("Error: cannot apply arithmetical operation on non-number type");
+
+                    case Instruction.Xor.Operator:
+
+                        if (Types.Type.isNumber(first_t))
+                        {
+                            string reg1 = PtrSize.CopyRegisterName(nameSize, 1);
+
+                            insts.Add(new Instruction.Mov(reg1, num));
+                            insts.Add(new Instruction.Xor(nameSize));
+                            break;
+                        }
+                        throw new Exception("Error: cannot apply arithmetical operation on non-number type");
+
                     case ':':
+
                         Var ind_var = new Var(
                             Gen.Generate(Types.Type.Size(Types.Type.U64)), 
                             Types.Type.U64
@@ -171,6 +233,7 @@ namespace lapis.Helpers
 
                         insts.AddRange(ind_init_insts);
                         break;
+
                     default:
                         throw new Exception("Error: Invalid operator");
                 }

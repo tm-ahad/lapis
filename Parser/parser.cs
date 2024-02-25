@@ -369,7 +369,7 @@ namespace lapis.parser
 
             Dictionary<string, byte> props = new Dictionary<string, byte>();
 
-            foreach (string line in propDecrLines) 
+            foreach (string line in propDecrLines)
             {
                 var spl = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
                 byte propType = Types.Type.FromString(spl.First());
