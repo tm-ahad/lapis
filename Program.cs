@@ -2,7 +2,7 @@
 using lapis.Asm.Gen;
 using lapis.Asm.Inst;
 using lapis.Link;
-using lapis.parser; 
+using lapis.parser;
 
 namespace lapis
 {

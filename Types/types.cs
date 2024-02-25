@@ -1,4 +1,6 @@
 ﻿using lapis.Asm.Ptr;
+using lapis.Constants;
+using velt.Helpers;
 
 namespace lapis.Types
 {
@@ -14,6 +16,7 @@ namespace lapis.Types
         I64 = 6,
         U64 = 7,
         Array = 8,
+        Struct = 9,
         Unknown = 255;
 
         private const string Arr_def = "[]";
@@ -66,6 +69,7 @@ namespace lapis.Types
 
                 return $"[]{arr_element_type_str}";
             }
+
 
             throw new Exception("5846162495");
         }
@@ -125,6 +129,7 @@ namespace lapis.Types
                         byte arr_element_type = (byte)(type - Array);
                         return arr_element_type.ToString();
                     }
+
                     throw new Exception($"Error: type {ToString(type)} not found");
             };
         }

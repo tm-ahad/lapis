@@ -2,12 +2,13 @@
 using lapis.Asm.Ptr;
 using lapis.Constants;
 using lapis.Helpers;
-using Microsoft.VisualBasic;
+using velt.Helpers;
 
 namespace lapis.parser
 {
     public class Parser : HelperParsers
     {
+        private readonly StructMap structMap = new();
         private new readonly FuncMap funcMap = new();
         private string loop_name = string.Empty;
         private ECmpOperations loop_comp = 0;
@@ -75,16 +76,52 @@ namespace lapis.parser
 
         private List<Instruction> ParseVarDecr(string line)
         {
+            var insts = new List<Instruction>();
             string[] split = line.Split(' ');
             string type = split[1];
             string name = split[2];
+
+            if (type.StartsWith('@'))
+            {
+                type = type.Substring(1);
+
+                IEnumerable<Struct> structs_t = structMap.map
+                    .Where(struc => struc.Name == type);
+                Struct struct_t;
+
+                if (structs_t.Count() == 0)
+                {
+                    throw new Exception($"Error: struct {type} not found");
+                }
+                else
+                {
+                    struct_t = structs_t.First();
+                }
+
+                foreach (var pair in struct_t.Props) 
+                {
+                    string prop_name = pair.Key;
+                    byte prop_type = pair.Value;
+                    byte prop_size = Types.Type.Size(prop_type);
+
+                    Var prop_var = new Var(Gen.Generate(prop_size), prop_type);
+
+                    insts.Add(new Instruction.Mov(
+                        prop_var.Pointer(), 
+                        Consts.Default_struct_property_value
+                    ));
+                    varMap.SetVar(prop_name, prop_var);
+                }
+
+                return insts;
+            }
 
             string raw_val = split[3];
             byte size = Types.Type.Size(Types.Type.FromString(type));
 
             string ptr = Gen.Generate(size);
             Var var = new Var(ptr, Types.Type.FromString(type));
-            ptr = var.Pointer();
+            ptr = var.Pointer(); 
 
             varMap.SetVar(name, var);
 
@@ -106,8 +143,6 @@ namespace lapis.parser
 
             byte _size = Types.Type.Size(var.Type);
             byte valSize = Types.Type.Size(varMap.GetVarType(val, var.Type));
-
-            var insts = new List<Instruction>();
 
             if (valType == Consts.Token_value)
             {
@@ -323,6 +358,29 @@ namespace lapis.parser
             }
         }
 
+        private void ParseStructDecr(string code)
+        {
+            var lines = code.Split("\n", StringSplitOptions.RemoveEmptyEntries);
+            var decrLine = lines.First();
+            var propDecrLines = lines.Skip(1);
+
+            var split = decrLine.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            var structName = split[1].Trim();
+
+            Dictionary<string, byte> props = new Dictionary<string, byte>();
+
+            foreach (string line in propDecrLines) 
+            {
+                var spl = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                byte propType = Types.Type.Size(Types.Type.FromString(spl.First()));
+                string propName = spl[1].Trim();
+
+                props.Add(propName, propType);
+            }
+
+            structMap.map.Add(new Struct(structName, props));
+        }
+
         public List<Instruction> Parse(string code)
         {
             List<Instruction> insts = new List<Instruction>();
@@ -360,6 +418,9 @@ namespace lapis.parser
                         break;
                     case Consts.Token_include:
                         insts.AddRange(ParseInclude(line));
+                        break;
+                    case Consts.Token_struct:
+                        ParseStructDecr(line);
                         break;
                     case Consts.Token_comment:
                         break;
