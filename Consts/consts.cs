@@ -1,4 +1,5 @@
 ﻿using lapis.Asm.Ptr;
+using System.Net.Http.Headers;
 
 namespace lapis.Constants
 {
@@ -20,6 +21,7 @@ namespace lapis.Constants
         public const string Token_if = "@if";
         public const string Token_expr = "expr";
         public const string Token_value = "lit";
+        public const string Token_deref = "deref";
         public const string Token_comment = "###";
         public const string Token_include = "inc";
         public const string Token_struct = "str";

@@ -29,6 +29,8 @@ namespace lapis.Helpers
 
             switch (value_type)
             {
+                case Consts.Token_ptr:
+                case Consts.Token_deref:
                 case Consts.Token_var:
                     val = varMap.GetVarPtr(value);
                     break;
@@ -37,9 +39,6 @@ namespace lapis.Helpers
                     break;
                 case Consts.Token_type:
                     val = 0.ToString();
-                    break;
-                case Consts.Token_ptr:
-                    val = varMap.GetVarPtr(value);
                     break;
                 case Consts.Token_expr:
                     var (ext, b) = ParseExpr(ptr, Types.Type.Size(type), value);
@@ -76,8 +75,6 @@ namespace lapis.Helpers
             char indexingOperator = ':';
             string pattern =
             $@"(?=[{
-                $"{Instruction.DerefPtr.Operator}" +
-                $"{Instruction.DerefPtr.Operator}" +
                 $"{Instruction.Xor.Operator}" +
                 $"{Instruction.Mul.Operator}" +
                 $"{Instruction.Add.Operator}" +
@@ -197,14 +194,6 @@ namespace lapis.Helpers
                             insts.Add(new Instruction.Xor(nameSize));
                             break;
                         }
-                        throw new Exception("Error: cannot apply arithmetical operation on non-number type");
-
-                    case Instruction.DerefPtr.Operator:
-
-                        string numPtr = varMap.GetVarPtr(num);
-
-                        insts.Add(new Instruction.DerefPtr(nameSize, numPtr));
-                        break;
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
 
                     case ':':

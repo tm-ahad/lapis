@@ -148,10 +148,13 @@ namespace lapis.parser
             {
                 insts.Add(new Instruction.Mov(ptr, val));
             }
-            else 
+            else if (valType == Consts.Token_deref)
+            {
+                insts.Add(new Instruction.DerefPtr(val, ptr, _size));
+            }
+            else
             {
                 bool isLea = valType == Consts.Token_ptr;
-                Console.WriteLine(ptr);
                 insts.Add(new Instruction.Copy(isLea, ptr, _size, val, valSize));
             }
 

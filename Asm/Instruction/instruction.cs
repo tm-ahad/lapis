@@ -1,6 +1,7 @@
 ﻿using lapis.Asm.Ptr;
 using lapis.Constants;
 using lapis.Helpers;
+using System.Runtime.CompilerServices;
 
 namespace lapis.Asm.Inst
 {
@@ -254,24 +255,25 @@ namespace lapis.Asm.Inst
             }
         }
 
-        public sealed class DerefPtr : OperatorInstruction
+        public sealed class DerefPtr : Instruction
         {
-            public const char Operator = '!';
-            private byte size;
+            private string DerefingPtr;
             private string ptr;
+            private byte size;
 
-            public DerefPtr(byte size, string ptr)
+            public DerefPtr(string Derefing_ptr, string ptr, byte size)
             {
-                this.size = size;
+                DerefingPtr = Derefing_ptr;
                 this.ptr = ptr;
+                this.size = size;
             }
 
             public override string ToString()
             {
-                string reg1 = PtrSize.CopyRegisterName(size, 0);
-                string reg2 = PtrSize.CopyRegisterName(Consts.Ptr_size, 1);
+                string reg1 = PtrSize.CopyRegisterName(Consts.Ptr_size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
 
-                return $"mov {reg2}, {ptr}\nmov {reg1},{reg2}";
+                return $"mov {reg1}, {DerefingPtr}\nmov {reg2},dword [{reg1}]\nmov {ptr}, {reg2}";
             }
         }
 
