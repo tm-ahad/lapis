@@ -53,7 +53,7 @@ namespace lapis.Helpers
             }
             else
             {
-                throw new Exception("Lapis is not installed on your machine.");
+                throw new Exception($"Error: {filePath} not found.");
             }
 
             return res.ToString();
@@ -112,7 +112,7 @@ namespace lapis.Helpers
         }
         public string GetStdLib(string name)
         {
-            string path = $"{homePath}/lib/{name}.lps";
+            string path = $"{homePath}/lib/{name}";
             return ReadFile(path);
         }
     }

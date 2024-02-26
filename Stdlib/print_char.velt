@@ -1,0 +1,7 @@
+fun int printChar byte a;
+   asm mov rax, 1;
+   asm mov rdi, 1;
+   asm movzx rsi, $a;
+   asm mov rdx, 1;
+   cal _syscall;
+ret;
