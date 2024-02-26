@@ -1,4 +1,5 @@
 ﻿using lapis.Asm.Ptr;
+using lapis.Constants;
 using lapis.Helpers;
 
 namespace lapis.Asm.Inst
@@ -28,37 +29,33 @@ namespace lapis.Asm.Inst
 
         public sealed class Copy : Instruction
         {
-            public string To;
-            public string From;
-            public byte ToSize;
-            public byte FromSize;
+            private string To;
+            private string From;
+            private byte ToSize;
+            private byte FromSize;
+            private bool isLea;
 
-            public Copy(string To, byte ToSize, string From, byte FromSize)
+            public Copy(bool isLea, string To, byte ToSize, string From, byte FromSize)
             {
                 this.To = To;
                 this.From = From;
                 this.ToSize = ToSize;
                 this.FromSize = FromSize;
+                this.isLea = isLea;
             }
 
             public override string ToString() {
                 string crn = PtrSize.CopyRegisterName(ToSize, 0);
+                string comm = isLea ? "lea" : ToSize > FromSize ? "movzx" : "mov";
 
-                if (ToSize > FromSize)
-                {
-                    return $"movzx {crn},{From}\nmov {To}, {crn}";
-                }
-                else 
-                {
-                    return $"mov {crn},{From}\nmov {To}, {crn}";
-                }
+                return $"{comm} {crn},{From}\nmov {To}, {crn}";
             }
         }
 
         public sealed class Add : OperatorInstruction
         {
             public const char Operator = '+';
-            public byte size;
+            private byte size;
 
             public Add(byte size)
             {
@@ -76,7 +73,7 @@ namespace lapis.Asm.Inst
         public sealed class Sub : OperatorInstruction
         {
             public const char Operator = '-';
-            public byte size;
+            private byte size;
 
             public Sub(byte size)
             {
@@ -94,7 +91,7 @@ namespace lapis.Asm.Inst
         public sealed class Mul : OperatorInstruction
         {
             public const char Operator = '*';
-            public byte size;
+            private byte size;
 
             public Mul(byte size)
             {
@@ -112,7 +109,7 @@ namespace lapis.Asm.Inst
         public sealed class Div : OperatorInstruction
         {
             public const char Operator = '/';
-            public byte size;
+            private byte size;
 
             public Div(byte size)
             {
@@ -129,7 +126,7 @@ namespace lapis.Asm.Inst
 
         public sealed class Call : Instruction
         {
-            public string function;
+            private string function;
 
             public Call(string function)
             {
@@ -141,7 +138,7 @@ namespace lapis.Asm.Inst
 
         public sealed class Func : Instruction
         {
-            public string function;
+            private string function;
 
             public Func(string function)
             {
@@ -153,7 +150,7 @@ namespace lapis.Asm.Inst
 
         public sealed class Asm : Instruction
         {
-            public string code;
+            private string code;
 
             public Asm(string asm) 
             {
@@ -165,8 +162,8 @@ namespace lapis.Asm.Inst
 
         public sealed class CmpOp : Instruction
         {
-            public ECmpOperations op;
-            public string label;
+            private ECmpOperations op;
+            private string label;
 
             public CmpOp(ECmpOperations op, string label)
             {
@@ -179,8 +176,8 @@ namespace lapis.Asm.Inst
 
         public sealed class Cmp : Instruction
         {
-            public string a;
-            public string b;
+            private string a;
+            private string b;
 
             public Cmp(string a, string b)
             {
@@ -193,7 +190,7 @@ namespace lapis.Asm.Inst
 
         public sealed class Jmp : Instruction
         {
-            public string label;
+            private string label;
 
             public Jmp(string label)
             {
@@ -206,7 +203,7 @@ namespace lapis.Asm.Inst
         public sealed class And : OperatorInstruction
         {
             public const char Operator = '&';
-            public byte size;
+            private byte size;
 
             public And(byte size)
             {
@@ -224,7 +221,7 @@ namespace lapis.Asm.Inst
         public sealed class Or : OperatorInstruction
         {
             public const char Operator = '|';
-            public byte size;
+            private byte size;
 
             public Or(byte size)
             {
@@ -242,7 +239,7 @@ namespace lapis.Asm.Inst
         public sealed class Xor : OperatorInstruction
         {
             public const char Operator = '^';
-            public byte size;
+            private byte size;
 
             public Xor(byte size)
             {
@@ -257,9 +254,29 @@ namespace lapis.Asm.Inst
             }
         }
 
+        public sealed class DerefPtr : OperatorInstruction
+        {
+            public const char Operator = '!';
+            private byte size;
+            private string ptr;
+
+            public DerefPtr(byte size, string ptr)
+            {
+                this.size = size;
+                this.ptr = ptr;
+            }
+
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(Consts.Ptr_size, 1);
+
+                return $"mov {reg2}, {ptr}\nmov {reg1},{reg2}";
+            }
+        }
+
         public sealed class Ret : Instruction
         {
-            public Ret() { }
             public override string ToString() => "ret";
         }
     }

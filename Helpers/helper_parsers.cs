@@ -1,7 +1,6 @@
 ﻿using lapis.Asm.Inst;
 using lapis.Asm.Ptr;
 using lapis.Constants;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace lapis.Helpers
@@ -39,6 +38,9 @@ namespace lapis.Helpers
                 case Consts.Token_type:
                     val = 0.ToString();
                     break;
+                case Consts.Token_ptr:
+                    val = varMap.GetVarPtr(value);
+                    break;
                 case Consts.Token_expr:
                     var (ext, b) = ParseExpr(ptr, Types.Type.Size(type), value);
                     val = b;
@@ -74,13 +76,15 @@ namespace lapis.Helpers
             char indexingOperator = ':';
             string pattern =
             $@"(?=[{
+                $"{Instruction.DerefPtr.Operator}" +
+                $"{Instruction.DerefPtr.Operator}" +
+                $"{Instruction.Xor.Operator}" +
                 $"{Instruction.Mul.Operator}" +
                 $"{Instruction.Add.Operator}" +
                 $"{Instruction.Sub.Operator}" +
                 $"{Instruction.Div.Operator}" +
                 $"{Instruction.And.Operator}" +
                 $"{Instruction.Or.Operator}" +
-                $"{Instruction.Xor.Operator}" +
                 $"{indexingOperator}"
             }])";
 
@@ -193,6 +197,14 @@ namespace lapis.Helpers
                             insts.Add(new Instruction.Xor(nameSize));
                             break;
                         }
+                        throw new Exception("Error: cannot apply arithmetical operation on non-number type");
+
+                    case Instruction.DerefPtr.Operator:
+
+                        string numPtr = varMap.GetVarPtr(num);
+
+                        insts.Add(new Instruction.DerefPtr(nameSize, numPtr));
+                        break;
                         throw new Exception("Error: cannot apply arithmetical operation on non-number type");
 
                     case ':':

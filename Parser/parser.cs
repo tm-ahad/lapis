@@ -40,7 +40,7 @@ namespace lapis.parser
 
                 if (name != ptr)
                 {
-                    insts.Insert(0, new Instruction.Copy(ptr, size, name, nameSize));
+                    insts.Insert(0, new Instruction.Copy(false, ptr, size, name, nameSize));
                 }
 
                 return insts;
@@ -67,7 +67,7 @@ namespace lapis.parser
 
                 if (name != destPtr)
                 {
-                    insts.Insert(0, new Instruction.Copy(destPtr, aItemSize, name, nameSize));
+                    insts.Insert(0, new Instruction.Copy(false, destPtr, aItemSize, name, nameSize));
                 }
 
                 return insts;
@@ -150,7 +150,9 @@ namespace lapis.parser
             }
             else 
             {
-                insts.Add(new Instruction.Copy(ptr, _size, val, valSize));
+                bool isLea = valType == Consts.Token_ptr;
+                Console.WriteLine(ptr);
+                insts.Add(new Instruction.Copy(isLea, ptr, _size, val, valSize));
             }
 
             insts.AddRange(extra);
@@ -204,7 +206,7 @@ namespace lapis.parser
                 var (ext, val, _) = ParseRawValue(arg_type, arg_name, param);
                 byte valSize = Types.Type.Size(varMap.GetVarType(val, _arg.Type));
 
-                insts.Add(new Instruction.Copy(arg_ptr, arg_size, val, valSize));
+                insts.Add(new Instruction.Copy(false, arg_ptr, arg_size, val, valSize));
                 insts.AddRange(ext);
             }
             insts.Add(new Instruction.Call(func_name));

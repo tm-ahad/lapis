@@ -1,4 +1,6 @@
-﻿namespace lapis.Constants
+﻿using lapis.Asm.Ptr;
+
+namespace lapis.Constants
 {
     public class Consts {
         // Tokens
@@ -23,6 +25,7 @@
         public const string Token_struct = "str";
         public const string Token_self = "self";
         public const string Token_type = "type";
+        public const string Token_ptr = "ptr";
 
         // Built-in variables
 
@@ -33,6 +36,8 @@
         public const string Default_element = "__TEMP_ELEMENT";
         public const string Default_func_res = "res";
         public const string Default_struct_property_value = "0";
+
+        public const byte Ptr_size = PtrSize.DWORD;
 
         //Assembler config
 
