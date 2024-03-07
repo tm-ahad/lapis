@@ -2,21 +2,19 @@
 using lapis.Asm.Ptr;
 using lapis.Constants;
 using lapis.Helpers;
+using velt.Context;
 using velt.Helpers;
 
 namespace lapis.parser
 {
     public class Parser : HelperParsers
     {
-        private readonly StructMap structMap = new();
-        private new readonly FuncMap funcMap = new();
-        private string loop_name = string.Empty;
-        private ECmpOperations loop_comp = 0;
-        private readonly int token_len = 3;
-        private string? op1 = null;
-        private string? op2 = null;
+        private Context ctx;
 
-        public Parser() : base(new VarMap(), new FuncMap()) { }
+        public Parser(Context ctx) : base(new VarMap(), new FuncMap()) 
+        {
+            this.ctx = ctx;
+        }
 
         private List<Instruction> ParseSetDecr(string line)
         {
@@ -42,7 +40,6 @@ namespace lapis.parser
                 {
                     insts.Insert(0, new Instruction.Copy(false, ptr, size, name, nameSize));
                 }
-
                 return insts;
             }
             else 
@@ -85,7 +82,7 @@ namespace lapis.parser
             {
                 type = type.Substring(1);
 
-                IEnumerable<Struct> structs_t = structMap.map
+                IEnumerable<Struct> structs_t = ctx.structMap.map
                     .Where(struc => struc.Name == type);
                 Struct struct_t;
 
@@ -170,9 +167,9 @@ namespace lapis.parser
                 new Instruction.Ret()
             ];
 
-            if (loop_name != string.Empty) 
+            if (ctx.loop_name != string.Empty) 
             {
-                insts.Insert(0, new Instruction.CmpOp(loop_comp, loop_name));
+                insts.Insert(0, new Instruction.CmpOp(ctx.loop_comp, ctx.loop_name));
             }
 
             return insts;
@@ -201,20 +198,24 @@ namespace lapis.parser
                 byte arg_type = arg.Item2;
 
                 Var _arg = varMap.GetVar(arg_name);
+
                 string arg_ptr = _arg.Pointer();
                 byte arg_size = Types.Type.Size(_arg.Type);
 
                 string param = parms[i];
-
+                Console.WriteLine("MOROR 1");
                 var (ext, val, _) = ParseRawValue(arg_type, arg_name, param);
+
+                Console.WriteLine("MOROR 2");
                 byte valSize = Types.Type.Size(varMap.GetVarType(val, _arg.Type));
 
                 insts.Add(new Instruction.Copy(false, arg_ptr, arg_size, val, valSize));
                 insts.AddRange(ext);
             }
-            insts.Add(new Instruction.Call(func_name));
 
+            insts.Add(new Instruction.Call(func_name));
             Gen.SetCurr(init_ptr_offset);
+
             return insts;
         }
 
@@ -263,7 +264,7 @@ namespace lapis.parser
 
         private Instruction ParseAsmDecr(string line)
         {
-            string asmLine = line.Substring(token_len).Trim();
+            string asmLine = line.Substring(Consts.TokenLen).Trim();
             return ParseAsmTemplate(asmLine);
         }
 
@@ -319,7 +320,7 @@ namespace lapis.parser
                 new Instruction.Func(label_name),
             ];
 
-            if (op1 != split[1] || op2 != split[3])
+            if (ctx.op1 != split[1] || ctx.op2 != split[3])
             {
                 insts = 
                 [
@@ -330,14 +331,14 @@ namespace lapis.parser
                     .. insts
                 ];
 
-                op1 = split[1];
-                op2 = split[3];
+                ctx.op1 = split[1];
+                ctx.op2 = split[3];
             }
 
             if (keyword == Consts.Token_unt) 
             {
-                loop_name = label_name;
-                loop_comp = op_val;
+                ctx.loop_name = label_name;
+                ctx.loop_comp = op_val;
             }
 
             return insts;
@@ -383,7 +384,7 @@ namespace lapis.parser
                 props.Add(propName, propType);
             }
 
-            structMap.map.Add(new Struct(structName, props));
+            ctx.structMap.map.Add(new Struct(structName, props));
         }
 
         public List<Instruction> Parse(string code)
@@ -395,7 +396,7 @@ namespace lapis.parser
                 string line = lin.Trim();
                 if (line.Length == 0) continue;
 
-                string tok = line.Substring(0, token_len);
+                string tok = line.Substring(0, Consts.TokenLen);
 
                 switch (tok)
                 {
@@ -427,9 +428,12 @@ namespace lapis.parser
                     case Consts.Token_struct:
                         ParseStructDecr(line);
                         break;
-                    case Consts.Token_comment:
-                        break;
                     default:
+                        if (tok.StartsWith(Consts.Token_comment)) 
+                        {
+                            continue;
+                        }
+
                         throw new Exception($"Error: Line starts with invalid token '{tok}'");
                 }
             }

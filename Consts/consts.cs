@@ -22,7 +22,7 @@ namespace lapis.Constants
         public const string Token_expr = "expr";
         public const string Token_value = "lit";
         public const string Token_deref = "deref";
-        public const string Token_comment = "###";
+        public const char Token_comment = '!';
         public const string Token_include = "inc";
         public const string Token_struct = "str";
         public const string Token_self = "self";
@@ -36,10 +36,14 @@ namespace lapis.Constants
         public const string Default_index = "__TEMP_INDEX";
 
         public const string Default_element = "__TEMP_ELEMENT";
+       
+        //Compiler config
+
         public const string Default_func_res = "res";
         public const string Default_struct_property_value = "0";
 
         public const byte Ptr_size = PtrSize.DWORD;
+        public const byte TokenLen = 3;
 
         //Assembler config
 

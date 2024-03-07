@@ -1,3 +1,10 @@
 fun not int a;
 	set res expr@a^0xFF;
 ret;
+
+fun notBool byte a;
+	set res lit@0
+
+	@if var@a equ lit@0;
+	set res lit@1;
+ret;

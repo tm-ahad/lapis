@@ -3,6 +3,7 @@ using lapis.Asm.Gen;
 using lapis.Asm.Inst;
 using lapis.Link;
 using lapis.parser;
+using velt.Context;
 
 namespace lapis
 {
@@ -19,7 +20,8 @@ namespace lapis
             string inputFile = args[0];
             string outputFile = args[1];
 
-            Parser parser = new Parser();
+            Context ctx = new Context();
+            Parser parser = new Parser(ctx);
             Assembler asm = new Assembler();
             Linker linker = new Linker();
 
