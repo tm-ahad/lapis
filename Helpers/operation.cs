@@ -13,16 +13,15 @@
     {
         public static string ToString(ECmpOperations op)
         {
-            switch (op)
+            return op switch
             {
-                case ECmpOperations.Je: return "je";
-                case ECmpOperations.Jb: return "jb";
-                case ECmpOperations.Jg: return "jg";
-                case ECmpOperations.Jge: return "jge";
-                case ECmpOperations.Jbe: return "jbe";
-                default:
-                    throw new Exception("SUIIIIIIIIIIIIIIII");
-            }
+                ECmpOperations.Je => "je",
+                ECmpOperations.Jb => "jb",
+                ECmpOperations.Jg => "jg",
+                ECmpOperations.Jge => "jge",
+                ECmpOperations.Jbe => "jbe",
+                _ => throw new Exception("SUIIIIIIIIIIIIIIII"),
+            };
         }
 
         public static Dictionary<string, ECmpOperations> Map()

@@ -5,9 +5,9 @@ namespace lapis.Helpers
 {
     public class Fetcher
     {
-        PlatformID platformId;
-        string homePath;
-        string shell;
+        readonly PlatformID platformId;
+        readonly string homePath;
+        readonly string shell;
 
         public Fetcher()
         {
@@ -37,13 +37,11 @@ namespace lapis.Helpers
             {
                 try
                 {
-                    using (StreamReader reader = new StreamReader(filePath))
+                    using StreamReader reader = new StreamReader(filePath);
+                    string? line;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            res.AppendLine(line);
-                        }
+                        res.AppendLine(line);
                     }
                 }
                 catch (Exception ex)
@@ -62,7 +60,6 @@ namespace lapis.Helpers
         public void ExecuteCommand(string command) 
         {
             Process process = new Process();
-
             process.StartInfo.FileName = shell;
 
             if (platformId == PlatformID.Win32NT)
@@ -97,11 +94,10 @@ namespace lapis.Helpers
 
             if (!Directory.Exists(dir))
             {
-                throw new Exception("Lapis is not installed on your machine.");
+                throw new Exception("Velt is not installed on your machine.");
             }
 
             string[] files = Directory.GetFiles(dir);
-
             foreach (string file in files)
             {
                 string content = File.ReadAllText(file);

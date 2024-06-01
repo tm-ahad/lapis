@@ -1,5 +1,4 @@
 ﻿using lapis.Asm.Ptr;
-using System.Net.Http.Headers;
 
 namespace lapis.Constants
 {

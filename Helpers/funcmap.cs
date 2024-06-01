@@ -6,9 +6,9 @@
 
         public List<Tuple<string, byte>> GetFuncParams(string var_name)
         {
-            if (map.ContainsKey(var_name))
+            if (map.TryGetValue(var_name, out Func? value))
             {
-                return map[var_name].Params;
+                return value.Params;
             }
             else
             {
@@ -18,9 +18,9 @@
 
         public byte GetFuncRetType(string var_name)
         {
-            if (map.ContainsKey(var_name))
+            if (map.TryGetValue(var_name, out Func? value))
             {
-                return map[var_name].Ret_type;
+                return value.Ret_type;
             }
             else
             {
@@ -29,9 +29,9 @@
         }
         public Func GetFunc(string var_name)
         {
-            if (map.ContainsKey(var_name))
+            if (map.TryGetValue(var_name, out Func? value))
             {
-                return map[var_name];
+                return value;
             }
             else
             {

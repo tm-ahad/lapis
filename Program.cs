@@ -27,10 +27,10 @@ namespace lapis
             string inputFile = args[0];
             string outputFile = args[1];
 
-            Context ctx = new Context();
-            Parser parser = new Parser(ctx);
-            Assembler asm = new Assembler();
-            Linker linker = new Linker();
+            Context ctx = new();
+            Parser parser = new(ctx);
+            Assembler asm = new();
+            Linker linker = new();
 
             try
             {

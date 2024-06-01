@@ -2,16 +2,10 @@
 
 namespace lapis.Helpers
 {
-    public class Var
+    public class Var(string head, byte type)
     {
-        public string Head;
-        public byte Type;
-
-        public Var(string head, byte type)
-        {
-            Head = head;
-            Type = type;
-        }
+        public string Head = head;
+        public byte Type = type;
 
         public string Pointer() 
         {

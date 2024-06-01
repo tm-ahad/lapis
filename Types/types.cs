@@ -1,5 +1,4 @@
 ﻿using lapis.Asm.Ptr;
-using lapis.Constants;
 
 namespace lapis.Types
 {
@@ -113,12 +112,12 @@ namespace lapis.Types
             {
                 case Byte: return byte.Parse(rawVal).ToString();
                 case I8: return sbyte.Parse(rawVal).ToString();
-                case I16: return Int16.Parse(rawVal).ToString();
-                case U16: return UInt16.Parse(rawVal).ToString();
+                case I16: return short.Parse(rawVal).ToString();
+                case U16: return ushort.Parse(rawVal).ToString();
                 case Int: return int.Parse(rawVal).ToString();
                 case Uint: return uint.Parse(rawVal).ToString();
-                case I64: return Int64.Parse(rawVal).ToString();
-                case U64: return UInt64.Parse(rawVal).ToString();
+                case I64: return long.Parse(rawVal).ToString();
+                case U64: return ulong.Parse(rawVal).ToString();
                 default: 
                     if (type >= Array)
                     {

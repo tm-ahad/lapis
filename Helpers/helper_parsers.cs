@@ -5,28 +5,21 @@ using System.Text.RegularExpressions;
 
 namespace lapis.Helpers
 {
-    public class HelperParsers
+    public class HelperParsers(VarMap varMap, FuncMap funcMap)
     {
-        protected VarMap varMap;
-        protected FuncMap funcMap;
-
-        public HelperParsers(VarMap varMap, FuncMap funcMap)
-        {
-            this.varMap = varMap;
-            this.funcMap = funcMap;
-        }
+        protected VarMap varMap = varMap;
+        protected FuncMap funcMap = funcMap;
 
         protected Tuple<List<Instruction>, string, string> ParseRawValue(byte type, string name, string raw_val)
         {
             string ptr = varMap.GetVarPtr(name);
-
-            string val = string.Empty;
-            List<Instruction> inst = new List<Instruction>();
             string[] spl = raw_val.Split("@", 2);
+            List<Instruction> inst = [];
 
             string value_type = spl[0];
             string value = spl[1];
 
+            string val;
             switch (value_type)
             {
                 case Consts.Token_ptr:
@@ -110,8 +103,7 @@ namespace lapis.Helpers
                     continue;
                 }
 
-                string num = element.Substring(1).Trim();
-
+                string num = element[1..].Trim();
                 switch (element[0])
                 {
                     case Instruction.Add.Operator:
@@ -244,7 +236,6 @@ namespace lapis.Helpers
             }
 
             insts.Add(new Instruction.Mov(name, resRegister));
-
             return new Tuple<List<Instruction>, string>
             (
                 insts, 

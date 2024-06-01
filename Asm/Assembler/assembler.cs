@@ -5,12 +5,7 @@ namespace lapis.Asm.Assembler
 {
     public class Assembler
     {
-        public Fetcher fetcher;
-
-        public Assembler()
-        {
-            fetcher = new Fetcher();
-        }
+        public Fetcher fetcher = new();
 
         public void Assemble(string name) 
         {

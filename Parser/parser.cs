@@ -7,14 +7,9 @@ using velt.Helpers;
 
 namespace lapis.parser
 {
-    public class Parser : HelperParsers
+    public class Parser(Context ctx) : HelperParsers(new VarMap(), new FuncMap())
     {
-        private Context ctx;
-
-        public Parser(Context ctx) : base(new VarMap(), new FuncMap()) 
-        {
-            this.ctx = ctx;
-        }
+        private readonly Context ctx = ctx;
 
         private List<Instruction> ParseSetDecr(string line)
         {
@@ -80,13 +75,13 @@ namespace lapis.parser
 
             if (type.StartsWith('@'))
             {
-                type = type.Substring(1);
+                type = type[1..];
 
                 IEnumerable<Struct> structs_t = ctx.structMap.map
                     .Where(struc => struc.Name == type);
                 Struct struct_t;
 
-                if (structs_t.Count() == 0)
+                if (!structs_t.Any())
                 {
                     throw new Exception($"Error: struct {type} not found");
                 }
@@ -115,8 +110,8 @@ namespace lapis.parser
 
             string raw_val = split[3];
             byte size = Types.Type.Size(Types.Type.FromString(type));
-            int arrayElements = Types.Type.arrElements(type);
 
+            int arrayElements = Types.Type.arrElements(type);
             string ptr;
 
             if (arrayElements != -1)
@@ -127,7 +122,6 @@ namespace lapis.parser
             {
                 ptr = Gen.Generate(size);
             }
-
             
             Var var = new Var(ptr, Types.Type.FromString(type));
             ptr = var.Pointer(); 
@@ -194,8 +188,8 @@ namespace lapis.parser
             string func_name = split[1];
             string[] parms = split[2].Trim().Split(",");
 
-            List<Instruction> insts = new List<Instruction>();
             var func_args = funcMap.GetFuncParams(func_name);
+            List<Instruction> insts = new();
 
             for (int i = 0; i < func_args.Count; i++)
             {
@@ -271,7 +265,7 @@ namespace lapis.parser
             return insts;
         }
 
-        private Instruction ParseAsmDecr(string line)
+        private Instruction.Asm ParseAsmDecr(string line)
         {
             string asmLine = line.Substring(Consts.TokenLen).Trim();
             return ParseAsmTemplate(asmLine);
@@ -359,17 +353,12 @@ namespace lapis.parser
             string include_type = inc_split[0];
             string include_path = inc_split[1];
 
-            switch (include_type) 
+            return include_type switch
             {
-                case Consts.Token_self:
-                    return Include.Self(include_path);
-                case Consts.Token_std:
-                    return Include.Std(include_path);
-                case Consts.Token_define:
-                    
-                default:
-                    throw new Exception($"Error: invalid include type '{include_type}'");
-            }
+                Consts.Token_self => Include.Self(include_path),
+                Consts.Token_std => Include.Std(include_path),
+                _ => throw new Exception($"Error: invalid include type '{include_type}'"),
+            };
         }
 
         private void ParseStructDecr(string code)

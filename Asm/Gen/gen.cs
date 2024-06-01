@@ -9,8 +9,8 @@ namespace lapis.Asm.Gen
     {
         public static string Generate(List<Instruction> insts)
         {
-            Fetcher fetcher = new Fetcher();
-            StringBuilder main = new StringBuilder();
+            Fetcher fetcher = new();
+            StringBuilder main = new();
             string prefixes = fetcher.FetchPrefixes();
 
             foreach (Instruction inst in insts)

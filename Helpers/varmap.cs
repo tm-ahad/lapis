@@ -5,7 +5,7 @@ namespace lapis.Helpers
 {
     public class VarMap
     {
-        private Dictionary<string, Var> map = new Dictionary<string, Var>();
+        private readonly Dictionary<string, Var> map = [];
         public VarMap() 
         {
             Var temp_index = new Var(Gen.Generate(4), Types.Type.U16);
@@ -33,9 +33,9 @@ namespace lapis.Helpers
 
         public string GetVarHead(string var_name)
         {
-            if (map.ContainsKey(var_name))
+            if (map.TryGetValue(var_name, out Var? value))
             {
-                return map[var_name].Head;
+                return value.Head;
             }
             else
             {
@@ -45,9 +45,9 @@ namespace lapis.Helpers
 
         public byte GetVarType(string var_name, byte? def)
         {
-            if (map.ContainsKey(var_name))
+            if (map.TryGetValue(var_name, out Var? value))
             {
-                return map[var_name].Type;
+                return value.Type;
             }
             else if (def == null)
             {
@@ -60,9 +60,9 @@ namespace lapis.Helpers
         }
         public Var GetVar(string var_name)
         {
-            if (map.ContainsKey(var_name))
+            if (map.TryGetValue(var_name, out Var? value))
             {
-                return map[var_name];
+                return value;
             }
             else
             {

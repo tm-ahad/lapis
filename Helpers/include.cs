@@ -10,16 +10,16 @@ namespace lapis.Helpers
         {
             string content = File.ReadAllText(path);
            
-            Context ctx = new Context();
-            Parser parser = new Parser(ctx);
+            Context ctx = new();
+            Parser parser = new(ctx);
 
             return parser.Parse(content);
         }
 
         public static List<Instruction> Std(string path)
         {
-            Context ctx = new Context();
-            Parser parser = new Parser(ctx);
+            Context ctx = new();
+            Parser parser = new(ctx);
             Fetcher fetcher = new();
 
             string content = fetcher.GetStdLib(path);

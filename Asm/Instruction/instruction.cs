@@ -203,7 +203,7 @@ namespace lapis.Asm.Inst
         public sealed class And : OperatorInstruction
         {
             public const char Operator = '&';
-            private byte size;
+            private readonly byte size;
 
             public And(byte size)
             {
@@ -215,6 +215,32 @@ namespace lapis.Asm.Inst
                 string reg1 = PtrSize.CopyRegisterName(size, 0);
                 string reg2 = PtrSize.CopyRegisterName(size, 1);
                 return $"and {reg1},{reg2}";
+            }
+        }
+
+        public sealed class Lsh(byte size) : OperatorInstruction
+        {
+            public const char Operator = '<';
+            private readonly byte size = size;
+
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"shl {reg1},{reg2}";
+            }
+        }
+
+        public sealed class Rsh(byte size) : OperatorInstruction
+        {
+            public const char Operator = '>';
+            private readonly byte size = size;
+
+            public override string ToString()
+            {
+                string reg1 = PtrSize.CopyRegisterName(size, 0);
+                string reg2 = PtrSize.CopyRegisterName(size, 1);
+                return $"shr {reg1},{reg2}";
             }
         }
 
