@@ -4,7 +4,7 @@
     {
         private static uint Curr = 0;
 
-        public static string Generate(byte size)
+        public static string Generate(uint size)
         {
             Curr += size;
             return $"{Curr}";

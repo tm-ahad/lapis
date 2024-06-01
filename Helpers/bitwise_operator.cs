@@ -18,7 +18,7 @@
                 case EBitwiseOperators.And: return "and";
                 case EBitwiseOperators.Or: return "or";
                 case EBitwiseOperators.Xor: return "xor";
-                default: return "SUIIIIIIIIII";
+                default: return string.Empty;
             }
         }
     }

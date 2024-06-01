@@ -22,12 +22,17 @@ namespace lapis.Constants
         public const string Token_expr = "expr";
         public const string Token_value = "lit";
         public const string Token_deref = "deref";
-        public const char Token_comment = '!';
         public const string Token_include = "inc";
         public const string Token_struct = "str";
         public const string Token_self = "self";
         public const string Token_type = "type";
+        public const string Token_macro = "macro";
+        public const string Token_define = "define";
+        public const string Token_arr_def = "[]";
         public const string Token_ptr = "ptr";
+
+        public const char Token_comment = '!';
+        public const char Token_prop = ':';
 
         // Built-in variables
 

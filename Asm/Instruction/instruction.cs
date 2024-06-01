@@ -1,7 +1,6 @@
 ﻿using lapis.Asm.Ptr;
 using lapis.Constants;
 using lapis.Helpers;
-using System.Runtime.CompilerServices;
 
 namespace lapis.Asm.Inst
 {

@@ -23,7 +23,6 @@ namespace lapis.Helpers
             Fetcher fetcher = new();
 
             string content = fetcher.GetStdLib(path);
-
             return parser.Parse(content);
         }
     }

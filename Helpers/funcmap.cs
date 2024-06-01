@@ -2,10 +2,7 @@
 {
     public class FuncMap
     {
-        private Dictionary<string, Func> map;
-        public FuncMap() {
-            map = new Dictionary<string, Func>();
-        }
+        private readonly Dictionary<string, Func> map = [];
 
         public List<Tuple<string, byte>> GetFuncParams(string var_name)
         {

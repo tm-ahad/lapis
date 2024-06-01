@@ -1,6 +1,5 @@
 ﻿using lapis.Asm.Ptr;
 using lapis.Constants;
-using velt.Helpers;
 
 namespace lapis.Types
 {
@@ -18,8 +17,6 @@ namespace lapis.Types
         Array = 8,
         Struct = 9,
         Unknown = 255;
-
-        private const string Arr_def = "[]";
 
         public static byte Size(byte type)
         {
@@ -41,7 +38,7 @@ namespace lapis.Types
             }
             else if (type >= Array) 
             {
-                return PtrSize.UNKNOWN;
+                return Size((byte)(type - Array));
             }
 
             throw new Exception($"Typerror: type {type} not found");
@@ -67,7 +64,7 @@ namespace lapis.Types
                 byte arr_element_type = (byte)(type - Array);
                 string arr_element_type_str = ToString(arr_element_type);
 
-                return $"[]{arr_element_type_str}";
+                return $"{arr_element_type_str}[<size>]";
             }
 
 
@@ -100,11 +97,10 @@ namespace lapis.Types
                 case "uint64": return U64;
             }
 
-            if (s.StartsWith(Arr_def))
+            if (s.EndsWith(']') && s.Contains('['))
             {
-                string raw_type = s.Substring(Arr_def.Length);
+                string raw_type = s.Substring(0, s.IndexOf('['));
                 byte type = FromString(raw_type);
-
                 return (byte)(Array + type);
             }
 
@@ -132,6 +128,20 @@ namespace lapis.Types
 
                     throw new Exception($"Error: type {ToString(type)} not found");
             };
+        }
+
+        public static int arrElements(string s)
+        {
+            int size = -1;
+
+            if (s.EndsWith(']') && s.Contains('['))
+            {
+                int start = s.IndexOf('[') + 1;
+                string ss = s[start..s.IndexOf("]")];
+                _ = int.TryParse(ss, out size);
+            }
+
+            return size;
         }
     }
 }

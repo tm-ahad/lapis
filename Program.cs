@@ -4,6 +4,7 @@ using lapis.Asm.Inst;
 using lapis.Link;
 using lapis.parser;
 using velt.Context;
+using velt.Precompiler;
 
 namespace lapis
 {
@@ -11,9 +12,15 @@ namespace lapis
     {
         static void Main(string[] args)
         {
-            if (args.Length < 2)
+
+            if (args.Length < 1)
             {
-                Console.WriteLine("Usage: lapis <input_file> <output_file>");
+                Console.WriteLine("Usage: velt <input_file> <output_file>");
+                return;
+            }
+            else if (args[0] == "version")
+            {
+                Console.WriteLine("Version 0.1.0");
                 return;
             }
 
@@ -27,8 +34,10 @@ namespace lapis
 
             try
             {
-                string fileContents = File.ReadAllText(inputFile);
-                List<Instruction> insts = parser.Parse(fileContents);
+                string code = File.ReadAllText(inputFile);
+
+                Precompiler.Compile(code);
+                List<Instruction> insts = parser.Parse(code);
                 string asm_out = Gen.Generate(insts);
 
                 File.WriteAllText($"{outputFile}.asm", asm_out);

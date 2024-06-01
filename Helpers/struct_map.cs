@@ -1,12 +1,11 @@
 ﻿namespace velt.Helpers
 {
-    public class StructMap
+    public struct StructMap
     {
-        public List<Struct> map;
+        public List<Struct> map = [];
 
         public StructMap()
         {
-            map = new List<Struct>();
         }
     }
 }

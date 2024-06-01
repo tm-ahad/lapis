@@ -97,7 +97,7 @@ namespace lapis.parser
 
                 foreach (var pair in struct_t.Props) 
                 {
-                    string prop_name = pair.Key;
+                    string prop_name = $"{name}{Consts.Token_prop}{pair.Key}";
                     byte prop_type = pair.Value;
                     byte prop_size = Types.Type.Size(prop_type);
 
@@ -115,8 +115,20 @@ namespace lapis.parser
 
             string raw_val = split[3];
             byte size = Types.Type.Size(Types.Type.FromString(type));
+            int arrayElements = Types.Type.arrElements(type);
 
-            string ptr = Gen.Generate(size);
+            string ptr;
+
+            if (arrayElements != -1)
+            {
+                ptr = Gen.Generate((uint)arrayElements*size);
+            } 
+            else
+            {
+                ptr = Gen.Generate(size);
+            }
+
+            
             Var var = new Var(ptr, Types.Type.FromString(type));
             ptr = var.Pointer(); 
 
@@ -156,7 +168,6 @@ namespace lapis.parser
             }
 
             insts.AddRange(extra);
-
             return insts;
         }
 
@@ -203,10 +214,8 @@ namespace lapis.parser
                 byte arg_size = Types.Type.Size(_arg.Type);
 
                 string param = parms[i];
-                Console.WriteLine("MOROR 1");
                 var (ext, val, _) = ParseRawValue(arg_type, arg_name, param);
 
-                Console.WriteLine("MOROR 2");
                 byte valSize = Types.Type.Size(varMap.GetVarType(val, _arg.Type));
 
                 insts.Add(new Instruction.Copy(false, arg_ptr, arg_size, val, valSize));
@@ -273,9 +282,6 @@ namespace lapis.parser
             string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string keyword = split[0];
             var op_map = CmpOperations.Map();
-
-            var op1_ptr = varMap.GetVarPtr(Consts.Default_operand1);
-            var op2_ptr = varMap.GetVarPtr(Consts.Default_operand2);
 
             var (ext1, operand1, _) = ParseRawValue
             (
@@ -359,6 +365,8 @@ namespace lapis.parser
                     return Include.Self(include_path);
                 case Consts.Token_std:
                     return Include.Std(include_path);
+                case Consts.Token_define:
+                    
                 default:
                     throw new Exception($"Error: invalid include type '{include_type}'");
             }
