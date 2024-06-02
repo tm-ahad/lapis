@@ -17,12 +17,12 @@ namespace lapis.Helpers
             switch (platform)
             {
                 case PlatformID.Win32NT:
-                    homePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.lapis";
+                    homePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.velt";
                     shell = "cmd.exe";
                     break;
                 case PlatformID.Unix:
                 case PlatformID.MacOSX:
-                    homePath = $"{Environment.GetEnvironmentVariable("HOME")}/.lapis";
+                    homePath = $"{Environment.GetEnvironmentVariable("HOME")}/.velt";
                     shell = "/bin/bash";
                     break;
                 default:
@@ -89,7 +89,6 @@ namespace lapis.Helpers
         public string FetchPrefixes()
         {
             StringBuilder res = new StringBuilder();
-
             string dir = $"{homePath}/essentials";
 
             if (!Directory.Exists(dir))

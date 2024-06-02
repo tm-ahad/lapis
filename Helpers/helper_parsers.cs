@@ -31,7 +31,7 @@ namespace lapis.Helpers
                     val = Types.Type.Value(value, type);
                     break;
                 case Consts.Token_type:
-                    val = 0.ToString();
+                    val = value;
                     break;
                 case Consts.Token_expr:
                     var (ext, b) = ParseExpr(ptr, Types.Type.Size(type), value);

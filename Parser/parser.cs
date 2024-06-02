@@ -114,9 +114,22 @@ namespace lapis.parser
             int arrayElements = Types.Type.arrElements(type);
             string ptr;
 
+            var (extra, val, valType) = ParseRawValue
+            (
+                Types.Type.FromString(type),
+                name,
+                raw_val
+            );
+
             if (arrayElements != -1)
             {
                 ptr = Gen.Generate((uint)arrayElements*size);
+                string[] vals = val.Split(',');
+
+                for (int i = 0; i < vals.Count(); i++) {
+                    uint i_ptr = uint.Parse(ptr) + (uint)i*size;
+                    insts.Add(new Instruction.Mov(Gen.Make(size, i_ptr.ToString()), vals[i]));
+                }
             } 
             else
             {
@@ -127,13 +140,6 @@ namespace lapis.parser
             ptr = var.Pointer(); 
 
             varMap.SetVar(name, var);
-
-            var (extra, val, valType) = ParseRawValue
-            (
-                Types.Type.FromString(type),
-                name,
-                raw_val
-            );
 
             if (valType == Consts.Token_type)
             {
