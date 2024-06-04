@@ -1,0 +1,5 @@
+fun byte exit int code
+	asm mov eax, 1;
+	asm mov ebx, $code;
+	cal _syscall;
+ret;

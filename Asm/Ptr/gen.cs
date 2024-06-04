@@ -1,4 +1,4 @@
-﻿namespace lapis.Asm.Ptr
+﻿namespace lapis.asm.ptr
 {
     public class Gen
     {

@@ -1,14 +1,14 @@
-﻿using lapis.Asm.Inst;
-using lapis.Asm.Ptr;
-using lapis.Constants;
-using lapis.Helpers;
-using velt.Context;
-using velt.Helpers;
+﻿using lapis.constants;
+using lapis.asm.inst;
+using lapis.asm.ptr;
+using lapis.helpers;
+using lapis.context;
 
 namespace lapis.parser
 {
     public class Parser(Context ctx) : HelperParsers(new VarMap(), new FuncMap())
     {
+        private readonly Include inc = new(ctx);
         private readonly Context ctx = ctx;
 
         private List<Instruction> ParseSetDecr(string line)
@@ -30,11 +30,11 @@ namespace lapis.parser
                 byte nameSize = Types.Type.Size(varMap.GetVarType(name, type));
 
                 List<Instruction> insts = extra;
-
                 if (name != ptr)
                 {
                     insts.Insert(0, new Instruction.Copy(false, ptr, size, name, nameSize));
                 }
+
                 return insts;
             }
             else 
@@ -124,10 +124,11 @@ namespace lapis.parser
             if (arrayElements != -1)
             {
                 ptr = Gen.Generate((uint)arrayElements*size);
-                string[] vals = val.Split(',');
+                string[] vals = raw_val.Split('@')[1].Split(',');
 
                 for (int i = 0; i < vals.Count(); i++) {
                     uint i_ptr = uint.Parse(ptr) + (uint)i*size;
+                    Console.WriteLine(i_ptr);
                     insts.Add(new Instruction.Mov(Gen.Make(size, i_ptr.ToString()), vals[i]));
                 }
             } 
@@ -135,7 +136,7 @@ namespace lapis.parser
             {
                 ptr = Gen.Generate(size);
             }
-            
+
             Var var = new Var(ptr, Types.Type.FromString(type));
             ptr = var.Pointer(); 
 
@@ -178,10 +179,12 @@ namespace lapis.parser
                 new Instruction.Ret()
             ];
 
-            if (ctx.loop_name != string.Empty) 
+            if (ctx.loopName != string.Empty) 
             {
-                insts.Insert(0, new Instruction.CmpOp(ctx.loop_comp, ctx.loop_name));
+                insts.Insert(0, new Instruction.CmpOp(ctx.loopComp, ctx.loopName));
             }
+
+            ctx.inSe = false;
 
             return insts;
         }
@@ -230,42 +233,42 @@ namespace lapis.parser
 
         private List<Instruction> ParseFuncDecr(string line)
         {
+            Tuple<string, FuncSign> fun = FuncSign.ParseFuncSign(line);
+
             uint init_ptr_offset = Gen.GetCurr();
             string[] split = line.Split(' ');
             string name = split[2].Trim();
             string parms = string.Join(' ', split.Skip(3).ToArray());
 
-            byte ret_type = Types.Type.FromString(split[1]);
+            byte ret_type = fun.Item2.retType;
 
             Var res = varMap.GetVar(Consts.Default_func_res);
             res.Type = ret_type;
             varMap.SetVar(Consts.Default_index, res);
 
-            List<Tuple<string, byte>> args = new List<Tuple<string, byte>>();
+            List<Tuple<string, byte>> args = [];
 
-            foreach (string arg in parms.Split(",", StringSplitOptions.RemoveEmptyEntries))
+            foreach (Tuple<string, byte> arg in fun.Item2.arguments)
             {
-                string[] spl = arg.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                string argName = arg.Item1;
+                byte argType = arg.Item2;
 
-                string arg_name = spl[1];
-                byte arg_type = Types.Type.FromString(spl[0]);
-
-                Var arg_var = new Var(
-                    Gen.Generate(Types.Type.Size(arg_type)), 
-                    arg_type
+                Var argVar = new(
+                    Gen.Generate(Types.Type.Size(argType)),
+                    argType
                 );
 
-                varMap.SetVar(arg_name, arg_var);
-                args.Add(Tuple.Create(arg_name, arg_type));
+                varMap.SetVar(argName, argVar);
+                args.Add(Tuple.Create(argName, argType));
             }
 
-            Func func = new Func(ret_type, args);
+            FuncSign func = new(ret_type, args);
             funcMap.SetFunc(name, func);
 
-            List<Instruction> insts = new List<Instruction> 
-            {
+            List<Instruction> insts =
+            [
                 new Instruction.Func(name)
-            };
+            ];
 
             Gen.SetCurr(init_ptr_offset);
             return insts;
@@ -281,7 +284,7 @@ namespace lapis.parser
         {
             string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string keyword = split[0];
-            var op_map = CmpOperations.Map();
+            var opMap = CmpOperations.Map();
 
             var (ext1, operand1, _) = ParseRawValue
             (
@@ -306,23 +309,20 @@ namespace lapis.parser
             }
 
             var REGISTER = PtrSize.CopyRegisterName(op2Size, 0);
-
             string op = split[2];
 
-            ECmpOperations? op_val_nullable = op_map[op];
-            ECmpOperations op_val = ECmpOperations.Je;
+            ECmpOperations? op_val_nullable = opMap[op];
 
             if (op_val_nullable == null) 
             {
                 throw new Exception($"Unknown cmp operation {op}");
             }
-
-            op_val = op_val_nullable ?? ECmpOperations.Je;
-            string label_name = IdGen.Gen(7);
+        
+            string label_name = IdGen.Gen(10);
 
             List<Instruction> insts = 
             [
-                new Instruction.CmpOp(op_val, label_name),
+                new Instruction.CmpOp(ECmpOperations.Je, label_name),
                 new Instruction.Func(label_name),
             ];
 
@@ -343,8 +343,8 @@ namespace lapis.parser
 
             if (keyword == Consts.Token_unt) 
             {
-                ctx.loop_name = label_name;
-                ctx.loop_comp = op_val;
+                ctx.loopName = label_name;
+                ctx.loopComp = ECmpOperations.Je;
             }
 
             return insts;
@@ -354,16 +354,16 @@ namespace lapis.parser
         {
             string[] split = line.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
             string include = split[1];
-            string[] inc_split = include.Split('@', 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] incSplit = include.Split('@', 2, StringSplitOptions.RemoveEmptyEntries);
 
-            string include_type = inc_split[0];
-            string include_path = inc_split[1];
+            string includeType = incSplit[0];
+            string includePath = incSplit[1];
 
-            return include_type switch
+            return includeType switch
             {
-                Consts.Token_self => Include.Self(include_path),
-                Consts.Token_std => Include.Std(include_path),
-                _ => throw new Exception($"Error: invalid include type '{include_type}'"),
+                Consts.Token_self => inc.Self(includePath),
+                Consts.Token_std => inc.Std(includePath),
+                _ => throw new Exception($"Error: invalid include type '{includeType}'"),
             };
         }
 
@@ -376,7 +376,7 @@ namespace lapis.parser
             var split = decrLine.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             var structName = split[1].Trim();
 
-            Dictionary<string, byte> props = new Dictionary<string, byte>();
+            Dictionary<string, byte> props = [];
 
             foreach (string line in propDecrLines)
             {
@@ -392,14 +392,32 @@ namespace lapis.parser
 
         public List<Instruction> Parse(string code)
         {
-            List<Instruction> insts = new List<Instruction>();
+            List<Instruction> insts = [];
 
-            foreach (string lin in code.Split(";"))
+            foreach (string lin in code.Split(";", StringSplitOptions.RemoveEmptyEntries))
             {
                 string line = lin.Trim();
-                if (line.Length == 0) continue;
+                string tok = line[..Consts.TokenLen];
 
-                string tok = line.Substring(0, Consts.TokenLen);
+                if (ctx.isLib) 
+                {
+                    if (!ctx.inSe) 
+                    {
+                        continue;
+                    }
+                    else if (tok == Consts.Token_fun) 
+                    {
+                        ctx.inSe = false;
+                    } 
+                    else if (tok == Consts.Token_ret) 
+                    {
+                        ctx.inSe = true;
+                    }
+                    else if (tok != Consts.Token_struct) 
+                    {
+                        continue;
+                    }
+                }
 
                 switch (tok)
                 {
@@ -431,6 +449,10 @@ namespace lapis.parser
                     case Consts.Token_struct:
                         ParseStructDecr(line);
                         break;
+                    case Consts.Token_funcheck:
+                        Tuple<string, FuncSign> fun = FuncSign.ParseFuncSign(line);
+                        ctx.funcheckMap.SetFunc(fun.Item1, fun.Item2);
+                        break;
                     default:
                         if (tok.StartsWith(Consts.Token_comment)) 
                         {
@@ -438,6 +460,14 @@ namespace lapis.parser
                         }
 
                         throw new Exception($"Error: Line starts with invalid token '{tok}'");
+                }
+            }
+
+            foreach (KeyValuePair<string, FuncSign> pair in ctx.funcheckMap.Map()) 
+            {
+                if (!ctx.funcMap.Contains(pair)) 
+                {
+                    throw new Exception($"Error: Function {pair.Key} with signature {pair.Value.ToString(pair.Key)} must be declared");
                 }
             }
 

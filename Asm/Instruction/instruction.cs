@@ -1,8 +1,8 @@
-﻿using lapis.Asm.Ptr;
-using lapis.Constants;
-using lapis.Helpers;
+﻿using lapis.asm.ptr;
+using lapis.constants;
+using lapis.helpers;
 
-namespace lapis.Asm.Inst
+namespace lapis.asm.inst
 {
     public interface OperatorInstruction: Instruction
     {

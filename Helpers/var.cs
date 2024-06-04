@@ -1,6 +1,6 @@
-﻿using lapis.Asm.Ptr;
+﻿using lapis.asm.ptr;
 
-namespace lapis.Helpers
+namespace lapis.helpers
 {
     public class Var(string head, byte type)
     {

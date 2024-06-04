@@ -1,11 +1,11 @@
-﻿using lapis.Constants;
-using lapis.Helpers;
+﻿using lapis.constants;
+using lapis.helpers;
 
-namespace lapis.Asm.Assembler
+namespace lapis.asm.assembler
 {
     public class Assembler
     {
-        public Fetcher fetcher = new();
+        private Fetcher fetcher = new();
 
         public void Assemble(string name) 
         {

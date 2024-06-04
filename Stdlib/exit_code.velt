@@ -1,0 +1,4 @@
+fun int exit_code int code;
+   asm mov eax, 1;
+   asm mov ebx, $code;
+   call _syscall

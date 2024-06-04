@@ -1,4 +1,4 @@
-﻿namespace velt.Helpers
+﻿namespace lapis.helpers
 {
     public struct StructMap
     {

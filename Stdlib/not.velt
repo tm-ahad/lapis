@@ -6,5 +6,5 @@ fun notBool byte a;
 	set res lit@0
 
 	@if var@a equ lit@0;
-	set res lit@1;
+		set res lit@1;
 ret;

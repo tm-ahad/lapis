@@ -1,13 +1,13 @@
-﻿using lapis.Asm.Inst;
-using lapis.Constants;
-using lapis.Helpers;
+﻿using lapis.asm.inst;
+using lapis.constants;
+using lapis.helpers;
 using System.Text;
 
-namespace lapis.Asm.Gen
+namespace lapis.asm.gen
 {
     public class Gen
     {
-        public static string Generate(List<Instruction> insts)
+        public static string Generate(List<Instruction> insts, bool isLib)
         {
             Fetcher fetcher = new();
             StringBuilder main = new();
@@ -18,12 +18,19 @@ namespace lapis.Asm.Gen
                 main.AppendLine(inst.ToString());
             }
 
-            return $"format {Consts.exeFormat} executable 3\n" +
-                $"segment readable executable\n"+
-                $"entry {Consts.entry}\n" + 
-                $"{prefixes}\n"+
-                $"{Consts.entry}:\n{main}"+
-                $"jmp {Consts.exitLabel}";
+            if (isLib) 
+            {
+                return main.ToString();
+            } 
+            else 
+            {
+                return $"format {Consts.exeFormat} executable 3\n" +
+                    $"segment readable executable\n"+
+                    $"entry {Consts.entry}\n" + 
+                    $"{prefixes}\n"+
+                    $"{Consts.entry}:\n{main}"+
+                    $"jmp {Consts.exitLabel}";
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using lapis.Asm.Ptr;
+﻿using lapis.asm.ptr;
 
 namespace lapis.Types
 {

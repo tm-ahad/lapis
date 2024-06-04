@@ -1,7 +1,7 @@
-﻿using lapis.Constants;
-using lapis.Helpers;
+﻿using lapis.constants;
+using lapis.helpers;
 
-namespace lapis.Link
+namespace lapis.link
 {
     public class Linker
     {

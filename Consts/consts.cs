@@ -1,10 +1,11 @@
-﻿using lapis.Asm.Ptr;
+﻿using lapis.asm.ptr;
 
-namespace lapis.Constants
+namespace lapis.constants
 {
     public class Consts {
         // Tokens
 
+        public const string Token_funcheck = "funcheck";
         public const string Token_var = "var";
         public const string Token_set = "set";
         public const string Token_add = "add";
@@ -29,7 +30,6 @@ namespace lapis.Constants
         public const string Token_define = "define";
         public const string Token_arr_def = "[]";
         public const string Token_ptr = "ptr";
-
         public const char Token_comment = '!';
         public const char Token_prop = ':';
 
@@ -68,5 +68,9 @@ namespace lapis.Constants
         //Linker config
 
         public const string linker = "ld";
+
+        //Other config
+        public const string lib_dir = "/libs";
+        public const string main_file = "main.velt";
     }
 }

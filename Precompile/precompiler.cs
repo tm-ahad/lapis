@@ -1,6 +1,6 @@
-﻿using lapis.Constants;
+﻿using lapis.constants;
 
-namespace velt.Precompiler
+namespace lapis.precompiler
 {
     public class Precompiler
     {

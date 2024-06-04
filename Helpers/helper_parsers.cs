@@ -1,9 +1,9 @@
-﻿using lapis.Asm.Inst;
-using lapis.Asm.Ptr;
-using lapis.Constants;
+﻿using lapis.asm.inst;
+using lapis.asm.ptr;
+using lapis.constants;
 using System.Text.RegularExpressions;
 
-namespace lapis.Helpers
+namespace lapis.helpers
 {
     public class HelperParsers(VarMap varMap, FuncMap funcMap)
     {
@@ -12,12 +12,13 @@ namespace lapis.Helpers
 
         protected Tuple<List<Instruction>, string, string> ParseRawValue(byte type, string name, string raw_val)
         {
-            string ptr = varMap.GetVarPtr(name);
             string[] spl = raw_val.Split("@", 2);
             List<Instruction> inst = [];
 
             string value_type = spl[0];
             string value = spl[1];
+
+            Console.WriteLine(value_type);
 
             string val;
             switch (value_type)
@@ -34,6 +35,7 @@ namespace lapis.Helpers
                     val = value;
                     break;
                 case Consts.Token_expr:
+                    string ptr = varMap.GetVarPtr(name);
                     var (ext, b) = ParseExpr(ptr, Types.Type.Size(type), value);
                     val = b;
                     inst = ext;

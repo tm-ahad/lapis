@@ -1,14 +1,14 @@
-﻿namespace lapis.Helpers
+﻿namespace lapis.helpers
 {
     public class FuncMap
     {
-        private readonly Dictionary<string, Func> map = [];
+        private readonly Dictionary<string, FuncSign> map = [];
 
         public List<Tuple<string, byte>> GetFuncParams(string var_name)
         {
-            if (map.TryGetValue(var_name, out Func? value))
+            if (map.TryGetValue(var_name, out FuncSign? value))
             {
-                return value.Params;
+                return value.arguments;
             }
             else
             {
@@ -18,18 +18,18 @@
 
         public byte GetFuncRetType(string var_name)
         {
-            if (map.TryGetValue(var_name, out Func? value))
+            if (map.TryGetValue(var_name, out FuncSign? value))
             {
-                return value.Ret_type;
+                return value.retType;
             }
             else
             {
                 throw new Exception($"Error: var {var_name} not found");
             }
         }
-        public Func GetFunc(string var_name)
+        public FuncSign GetFunc(string var_name)
         {
-            if (map.TryGetValue(var_name, out Func? value))
+            if (map.TryGetValue(var_name, out FuncSign? value))
             {
                 return value;
             }
@@ -39,9 +39,19 @@
             }
         }
 
-        public void SetFunc(string var_name, Func func)
+        public void SetFunc(string var_name, FuncSign func)
         {
             map[var_name] = func;
+        }
+
+        public Dictionary<string, FuncSign> Map() 
+        {
+            return map;
+        }
+
+        public bool Contains(KeyValuePair<string, FuncSign> sign) 
+        {
+            return map.Contains(sign);
         }
     }
 }

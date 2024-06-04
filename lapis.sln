@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "velt", "velt.csproj", "{E0E36C30-F1EF-4756-BD1B-73302528869A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lapis", "lapis.csproj", "{E0E36C30-F1EF-4756-BD1B-73302528869A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{186DDD58-3D4F-4FA4-BF9C-33F01E228E96}"
 	ProjectSection(SolutionItems) = preProject

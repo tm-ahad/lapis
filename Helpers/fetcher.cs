@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace lapis.Helpers
+namespace lapis.helpers
 {
     public class Fetcher
     {
-        readonly PlatformID platformId;
-        readonly string homePath;
-        readonly string shell;
+        private readonly PlatformID platformId;
+        private readonly string homePath;
+        private readonly string shell;
 
         public Fetcher()
         {
@@ -37,7 +37,7 @@ namespace lapis.Helpers
             {
                 try
                 {
-                    using StreamReader reader = new StreamReader(filePath);
+                    using StreamReader reader = new(filePath);
                     string? line;
                     while ((line = reader.ReadLine()) != null)
                     {

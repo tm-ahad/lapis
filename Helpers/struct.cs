@@ -1,4 +1,4 @@
-﻿namespace velt.Helpers
+﻿namespace lapis.helpers
 {
     public class Struct(string name, Dictionary<string, byte> props)
     {

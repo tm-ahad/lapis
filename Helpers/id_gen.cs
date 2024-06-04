@@ -1,4 +1,4 @@
-﻿namespace lapis.Helpers
+﻿namespace lapis.helpers
 {
     public class IdGen
     {

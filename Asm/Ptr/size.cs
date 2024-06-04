@@ -1,6 +1,6 @@
-﻿using lapis.Constants;
+﻿using lapis.constants;
 
-namespace lapis.Asm.Ptr
+namespace lapis.asm.ptr
 {
     public class PtrSize
     {

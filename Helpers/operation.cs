@@ -1,4 +1,4 @@
-﻿namespace lapis.Helpers
+﻿namespace lapis.helpers
 {
     public enum ECmpOperations 
     {
@@ -20,7 +20,7 @@
                 ECmpOperations.Jg => "jg",
                 ECmpOperations.Jge => "jge",
                 ECmpOperations.Jbe => "jbe",
-                _ => throw new Exception("SUIIIIIIIIIIIIIIII"),
+                _ => throw new Exception("Invalid jump operation"),
             };
         }
 

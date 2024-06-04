@@ -1,17 +1,18 @@
-﻿using lapis.Asm.Ptr;
-using lapis.Constants;
+﻿using lapis.asm.ptr;
+using lapis.constants;
 
-namespace lapis.Helpers
+namespace lapis.helpers
 {
     public class VarMap
     {
         private readonly Dictionary<string, Var> map = [];
+        
         public VarMap() 
         {
-            Var temp_index = new Var(Gen.Generate(4), Types.Type.U16);
-            Var temp_op1 = new Var(Gen.Generate(2), Types.Type.Byte);
-            Var temp_op2 = new Var(Gen.Generate(2), Types.Type.Byte);
-            Var res = new Var(Gen.Generate(8), 255);
+            Var temp_index = new(Gen.Generate(4), Types.Type.U16);
+            Var temp_op1 = new(Gen.Generate(2), Types.Type.Byte);
+            Var temp_op2 = new(Gen.Generate(2), Types.Type.Byte);
+            Var res = new(Gen.Generate(8), 255);
 
             map[Consts.Default_operand1] = temp_op1;
             map[Consts.Default_operand2] = temp_op2;
